@@ -1,0 +1,278 @@
+﻿
+
+@model  List<SearchEngine.API.Models.SearchResult> 
+
+@{
+	Layout = "_Layout.cshtml";
+}
+
+
+<div style="display:flex;justify-content:center;flex-direction:column;    align-items: center;">
+
+
+
+
+
+	<br>
+	<div style="width:70%;">
+		@if (Model != null)
+		{
+			@foreach (SearchEngine.API.Models.SearchResult item in Model)
+			{
+				if (item.Source == SearchEngine.API.Models.SearchResultType.Youtube.ToString())
+				{
+
+					@foreach (SearchEngine.API.Controllers.YoutubeResultModel youtubeItem in item.Result)
+					{
+						@switch (youtubeItem.ResultType)
+						{
+							case "Channel":
+								<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+      background-color: #1d1d41;
+color:white;
+    border: #ff000061 solid 1px;">
+
+									<div style="position:absolute;right:5px">
+										<img src=@Url.Content("~/youtube.png")
+									width="30px" height="30px" />
+									</div>
+									<a  target="_blank" href="https://www.youtube.com/channel/@youtubeItem.ChannelId">
+										<h4>@youtubeItem.ChannelTitle</h4>
+									</a>	
+									<p>@youtubeItem.ResultType</p>
+									<p>@youtubeItem.PublishedAt</p>
+									<p>@youtubeItem.ChannelDescription</p>
+
+								</div>
+								break;
+							case "Video":
+								<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41; 
+color:white;
+    border: #ff000061 solid 1px;">
+
+									<div style="position:absolute;right:5px">
+									<img src =@Url.Content("~/youtube.png") width="30px" height="30px" />
+								</div>
+									<a target="_blank" href="https://www.youtube.com/watch?v=@youtubeItem.VideoId">
+										<h4>	@youtubeItem.VideoTitle</h4>
+									</a>
+									<p>@youtubeItem.ChannelTitle</p>
+									<p>@youtubeItem.ResultType</p>
+									<p>Likes  -@youtubeItem.VideoLikes  - Views  - @youtubeItem.VideoViews</p>
+									<p>@youtubeItem.VideoTitle</p>
+								</div>
+								break;
+							case "Playlist":
+								<div style="    padding: 10px;
+    border-radius: 20px;
+    /* background-color: red; */
+    border: #ff000061 solid 1px;"
+								>
+
+									<img src=@Url.Content("~/youtube.png")  width="30px" height="30px" />
+
+									<h4>@youtubeItem.PlaylistTitle</h4>
+									<p>@youtubeItem.ResultType</p>
+									<p>@youtubeItem.PlaylistDesceription</p>
+
+								</div>
+								break;
+						}
+
+						<br />
+					}
+
+				}
+
+				if (item.Source == SearchEngine.API.Models.SearchResultType.Instagram_Twitter.ToString())
+				{
+					@foreach (SearchEngine.API.Models.InstagramAndTwitterResult Item in item.Result)
+					{
+						<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41; 
+color:white;
+    border: #6c6a7961 solid 1px;">
+
+				
+				<div style="position:absolute;right:5px">
+								@if (Item.Type == "Instagram")
+								{
+									<img src=@Url.Content("~/instagram.png")
+					 width="30px" height="30px" />
+								}
+								else
+								{
+									<img src=@Url.Content("~/twitter.png")
+					 width="30px" height="30px" />
+								}
+
+				</div>
+
+
+
+
+							<a target="_blank" href=@Item.Link >
+							
+								<h4>@Item.Header</h4>
+							</a>
+
+
+							<p>
+								
+							</p>
+
+						</div>
+						<br />
+					}
+				}
+				if (item.Source == SearchEngine.API.Models.SearchResultType.Google_News.ToString())
+				{
+					@foreach (SearchEngine.API.Controllers.NewsModel newsItem in item.Result)
+					{
+						<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41; 
+color:white;
+    border: #6c6a7961 solid 1px;">
+
+							<div style="position:absolute;left:5px;top:40%">
+							<img src=@Url.Content("~/google.png")
+				 width="30px" height="30px" />
+				 </div>
+
+				 <a target="_blank" href="@newsItem.SourceLink">
+
+								<h4>@newsItem.Title</h4>
+				 </a>
+						
+							<p>
+								@newsItem.Description
+							</p>
+							<p>
+								@newsItem.Source
+							</p>
+
+						</div>
+						<br />
+					}
+				}
+
+				if (item.Source == SearchEngine.API.Models.SearchResultType.Google_Reviews.ToString())
+				{
+					@foreach (SearchEngine.API.Models.GoogleReviews reviewItem in item.Result)
+					{
+						if (string.IsNullOrEmpty(reviewItem.Title)) continue;
+						<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41;
+color:white;
+    border: #6c6a7961 solid 1px;">
+							<div style="position:absolute;right:5px">
+							@if (reviewItem.Type == "Place") { 
+										<img src=@Url.Content("~/map.png")
+				 width="30px" height="30px" />
+							}else{
+
+								<img src=@Url.Content("~/google-play.png")
+				 width="30px" height="30px" />
+							}
+				</div>
+
+							<a target="_blank" href="">
+								@if (reviewItem.Type == "Apps_Games")
+								{
+									<img src=@reviewItem.ImageLink
+					 />
+								}
+								<h4>@reviewItem.Title</h4>
+							</a>
+
+						
+							<p>
+								@reviewItem.Rate  <img src="~/star.png" width="15" height="15" />  
+								@if(reviewItem.Type == "Place"){
+							<span>@reviewItem.ReviewsNumber  Reviews</span>
+								}
+						</p>
+
+						</div>
+						<br />
+					}
+				}
+
+				if (item.Source == SearchEngine.API.Models.SearchResultType.Wikipedia.ToString())
+				{
+					@foreach (SearchEngine.API.Models.WikipediaResult wikiItem in item.Result)
+					{
+						<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41;
+color:white;
+    border: #6c6a7961 solid 1px;">
+
+							<div style="position:absolute;right:5px">
+								<img src=@Url.Content("~/wiki.png")
+				 width="30px" height="30px" />
+						
+				</div>		
+
+
+							<a target="_blank" href="">
+								@if (wikiItem.ThumbImg != "")
+								{
+									<img src=@wikiItem.ThumbImg />
+								}
+								<h4>@wikiItem.Title</h4>
+							</a>
+
+
+							<p>
+								@wikiItem.Description
+							</p>
+
+						</div>
+						<br />
+					}
+				}
+
+
+
+
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		}
+
+	</div>
+
+</div>
+
+<div style="position:absolute;bottom:5px;    left: 30%;
+    right: 30%;">
+
+
+	<form method="post" asp-action="Search" class="row" >
+		<input class="form-control" name="query" style="border-radius:50px" placeholder="What's on your mind ?"/>
+		@*<button class="btn btn-primary col-4" type="submit">Search</button>
+*@
+
+	</form>
+
+</div>
+			
