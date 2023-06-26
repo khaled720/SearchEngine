@@ -26,7 +26,7 @@ namespace SearchEngine.API.Controllers
             await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
             var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
-                Headless = false,
+                Headless = true,
             });
             List<WikipediaResult> wikipediaResults = new ();
             List<GoogleReviews> googleReviews = new();
@@ -196,15 +196,18 @@ namespace SearchEngine.API.Controllers
                  HtmlDocument htmlDocument = new();
                  htmlDocument.LoadHtml(content);
                  var Results = htmlDocument.DocumentNode.ChildNodes.Descendants("a").Where(r => r.ParentNode.Attributes["class"] != null).Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf").ToList();
-                 foreach (var item in Results)
+                        var ListOfDesc = htmlDocument.DocumentNode.ChildNodes.Descendants("span").Where(r => r.ParentNode.Attributes["class"] != null).Where(y => y.ParentNode.Attributes["class"].Value == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf").ToList();
+                        var counter = 0;
+                        foreach (var item in Results)
                  {
-                     InstgramResultsList.Add(new InstagramAndTwitterResult()
-                     {
-                         Type = "Instagram",
-                         Header = item.ChildNodes[1].InnerText,
-                         Link = item.ChildNodes[2].InnerText.Replace("instagram.com", "").Replace(" > ", "/").Replace(" › ", "instagram.com/")
-                     });
-
+                            InstgramResultsList.Add(new InstagramAndTwitterResult()
+                            {
+                                Type = "Instagram",
+                                Header = item.ChildNodes[1].InnerText,
+                                Link = item.ChildNodes[2].InnerText.Replace("instagram.com", "").Replace(" > ", "/").Replace(" › ", "instagram.com/"),
+                                Description = ListOfDesc[counter].InnerText
+                            }) ;
+                            counter++;
                  }
 
 
@@ -236,15 +239,20 @@ namespace SearchEngine.API.Controllers
                   HtmlDocument htmlDocument1 = new();
                   htmlDocument1.LoadHtml(content1);
                   var Results1 = htmlDocument1.DocumentNode.ChildNodes.Descendants("a").Where(r => r.ParentNode.Attributes["class"] != null).Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf").ToList();
-                  foreach (var item in Results1)
+                  var ListOfDesc = htmlDocument1.DocumentNode.ChildNodes.Descendants("span").Where(r => r.ParentNode.Attributes["class"] != null).Where(y => y.ParentNode.Attributes["class"].Value == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf").ToList();
+                      var counter = 0;
+                      foreach (var item in Results1)
                   {
-                      InstgramResultsList.Add(new InstagramAndTwitterResult()
-                      {
-                          Type = "Twitter",
-                          Header = item.ChildNodes[1].InnerText,
-                          Link = item.ChildNodes[2].InnerText.Replace("twitter.com", "").Replace(" > ", "/").Replace(" › ", "twitter.com/")
-                      });
-                  }
+                          InstgramResultsList.Add(new InstagramAndTwitterResult()
+                          {
+                              Type = "Twitter",
+                              Header = item.ChildNodes[1].InnerText,
+                              Link = item.ChildNodes[2].InnerText.Replace("twitter.com", "").Replace(" > ", "/").Replace(" › ", "twitter.com/"),
+                              Description = ListOfDesc[counter].InnerText
+
+                          }) ;
+                          counter++;
+                      }
 
               }
 

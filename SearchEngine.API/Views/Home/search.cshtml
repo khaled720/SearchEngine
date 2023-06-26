@@ -31,19 +31,20 @@
     border-radius: 20px;position:relative;
       background-color: #1d1d41;
 color:white;
-    border: #ff000061 solid 1px;">
+    border: #ff000061 solid 0px;">
 
-									<div style="position:absolute;right:5px">
+									<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
 										<img src=@Url.Content("~/youtube.png")
 									width="30px" height="30px" />
 									</div>
+									<div style="margin-left:50px">
 									<a  target="_blank" href="https://www.youtube.com/channel/@youtubeItem.ChannelId">
 										<h4>@youtubeItem.ChannelTitle</h4>
 									</a>	
 									<p>@youtubeItem.ResultType</p>
 									<p>@youtubeItem.PublishedAt</p>
 									<p>@youtubeItem.ChannelDescription</p>
-
+									</div>
 								</div>
 								break;
 							case "Video":
@@ -51,33 +52,37 @@ color:white;
     border-radius: 20px;position:relative;
      background-color: #1d1d41; 
 color:white;
-    border: #ff000061 solid 1px;">
+    border: #ff000061 solid 0px;">
 
-									<div style="position:absolute;right:5px">
+									<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
 									<img src =@Url.Content("~/youtube.png") width="30px" height="30px" />
 								</div>
-									<a target="_blank" href="https://www.youtube.com/watch?v=@youtubeItem.VideoId">
+												
+							<div style="margin-left:50px">
+								<a target="_blank" href="https://www.youtube.com/watch?v=@youtubeItem.VideoId">
 										<h4>	@youtubeItem.VideoTitle</h4>
 									</a>
 									<p>@youtubeItem.ChannelTitle</p>
 									<p>@youtubeItem.ResultType</p>
 									<p>Likes  -@youtubeItem.VideoLikes  - Views  - @youtubeItem.VideoViews</p>
 									<p>@youtubeItem.VideoTitle</p>
+									</div>
 								</div>
 								break;
 							case "Playlist":
 								<div style="    padding: 10px;
     border-radius: 20px;
     /* background-color: red; */
-    border: #ff000061 solid 1px;"
+    border: #ff000061 solid 0px;"
 								>
 
 									<img src=@Url.Content("~/youtube.png")  width="30px" height="30px" />
-
+									<div style="margin-left:50px">
 									<h4>@youtubeItem.PlaylistTitle</h4>
 									<p>@youtubeItem.ResultType</p>
 									<p>@youtubeItem.PlaylistDesceription</p>
 
+									</div>
 								</div>
 								break;
 						}
@@ -95,10 +100,10 @@ color:white;
     border-radius: 20px;position:relative;
      background-color: #1d1d41; 
 color:white;
-    border: #6c6a7961 solid 1px;">
+    border: #6c6a7961 solid 0px;">
 
 				
-				<div style="position:absolute;right:5px">
+				<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
 								@if (Item.Type == "Instagram")
 								{
 									<img src=@Url.Content("~/instagram.png")
@@ -112,7 +117,7 @@ color:white;
 
 				</div>
 
-
+					<div style="margin-left:50px">
 
 
 							<a target="_blank" href=@Item.Link >
@@ -122,8 +127,9 @@ color:white;
 
 
 							<p>
-								
+								@Item.Description
 							</p>
+							</div>
 
 						</div>
 						<br />
@@ -137,24 +143,30 @@ color:white;
     border-radius: 20px;position:relative;
      background-color: #1d1d41; 
 color:white;
-    border: #6c6a7961 solid 1px;">
+    border: #6c6a7961 solid 0px;">
 
-							<div style="position:absolute;left:5px;top:40%">
+							<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
 							<img src=@Url.Content("~/google.png")
 				 width="30px" height="30px" />
 				 </div>
+				
+				
 
-				 <a target="_blank" href="@newsItem.SourceLink">
+							<div style="margin-left:50px">
 
-								<h4>@newsItem.Title</h4>
-				 </a>
-						
-							<p>
-								@newsItem.Description
-							</p>
-							<p>
-								@newsItem.Source
-							</p>
+								<a target="_blank" href="@newsItem.SourceLink">
+
+									<h4>@newsItem.Title</h4>
+								</a>
+
+								<p>
+									@newsItem.Description
+								</p>
+								<p>
+									@newsItem.Source
+								</p>
+
+							</div>
 
 						</div>
 						<br />
@@ -170,8 +182,8 @@ color:white;
     border-radius: 20px;position:relative;
      background-color: #1d1d41;
 color:white;
-    border: #6c6a7961 solid 1px;">
-							<div style="position:absolute;right:5px">
+    border: #6c6a7961 solid 0px;">
+							<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
 							@if (reviewItem.Type == "Place") { 
 										<img src=@Url.Content("~/map.png")
 				 width="30px" height="30px" />
@@ -182,6 +194,7 @@ color:white;
 							}
 				</div>
 
+							<div style="margin-left:50px">
 							<a target="_blank" href="">
 								@if (reviewItem.Type == "Apps_Games")
 								{
@@ -199,6 +212,7 @@ color:white;
 								}
 						</p>
 
+								</div >
 						</div>
 						<br />
 					}
@@ -212,19 +226,21 @@ color:white;
     border-radius: 20px;position:relative;
      background-color: #1d1d41;
 color:white;
-    border: #6c6a7961 solid 1px;">
+    border: #6c6a7961 solid 0px;">
 
-							<div style="position:absolute;right:5px">
+							<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
 								<img src=@Url.Content("~/wiki.png")
 				 width="30px" height="30px" />
 						
-				</div>		
+				</div>
 
-
+						
+							<div style="margin-left:50px">
 							<a target="_blank" href="">
 								@if (wikiItem.ThumbImg != "")
 								{
-									<img src=@wikiItem.ThumbImg />
+									
+									<img src="//@wikiItem.ThumbImg" />
 								}
 								<h4>@wikiItem.Title</h4>
 							</a>
@@ -233,7 +249,7 @@ color:white;
 							<p>
 								@wikiItem.Description
 							</p>
-
+							</div>
 						</div>
 						<br />
 					}
@@ -262,8 +278,8 @@ color:white;
 	</div>
 
 </div>
-
-<div style="position:absolute;bottom:5px;    left: 30%;
+<br />
+<div style="position:fixed;bottom:10px;    left: 30%;
     right: 30%;">
 
 

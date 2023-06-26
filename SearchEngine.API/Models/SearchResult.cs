@@ -63,6 +63,7 @@
         public string Header { get; set; }
         public string Link { get; set; }
         public string Type { get; set; }
+        public string Description { get; internal set; }
         //public string Name { get; set; }
         //public string Posts { get; set; }
 
