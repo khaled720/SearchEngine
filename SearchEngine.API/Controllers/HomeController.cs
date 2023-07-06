@@ -24,9 +24,12 @@ namespace SearchEngine.API.Controllers
 
             var browserFetcher = new BrowserFetcher();
             await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+            string[] args = { "--no-sandbox" };
+            
             var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
+                Args =args
             });
             List<WikipediaResult> wikipediaResults = new ();
             List<GoogleReviews> googleReviews = new();
