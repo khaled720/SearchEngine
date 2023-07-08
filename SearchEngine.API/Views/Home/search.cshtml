@@ -1,4 +1,6 @@
-﻿
+﻿@using SearchEngine.API.Controllers;
+@using SearchEngine.API.Models;
+
 
 @model  List<SearchEngine.API.Models.SearchResult> 
 
@@ -17,8 +19,26 @@
 	<div style="width:70%;">
 		@if (Model != null)
 		{
+			<br>
+			<div style="display :flex;background-color:#0000000a">
+				@foreach (var item in Enum.GetValues(typeof(SearchResultType)))
+				{
+					@*displying Types of results Google youtube twitter*@
+
+							<a href="@item?query=apple" class="btn btn-danger" style="padding:15px;border-radius:20px;">
+								@item
+							</a>
+				}
+
+
+					</div>
+					<br>
 			@foreach (SearchEngine.API.Models.SearchResult item in Model)
 			{
+
+
+
+
 				if (item.Source == SearchEngine.API.Models.SearchResultType.Youtube.ToString())
 				{
 
@@ -91,10 +111,98 @@ color:white;
 					}
 
 				}
+			
+				if (item.Source == SearchEngine.API.Models.SearchResultType.Google_Engine.ToString())
+				{
+			
+					<div style="display :flex;background-color:#0000000a">
+
+						@foreach (var itm in (Dictionary<string, string>)item.Result.Filters)
+						{
+							<a href="@itm.Value" class="btn btn-primary" style="padding:15px;border-radius:20px;">
+								@itm.Key
+							</a>
+						}
+
+
+					</div>
+					<hr>
+
+
+					<!--
+
+                     <div style="    padding: 10px;
+                        border-radius: 20px;position:relative;
+                         background-color: #1d1d90;
+                    color:white;width:80%;
+                        border: #6c6a7961 solid 0px;">
+
+
+                                            <div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+
+                    @*<img src=@Url.Content("~/twitter.png")
+                                             width="30px" height="30px" />*@
+
+
+                                            </div>
+
+
+                                            <div style="margin-left:50px">
+
+
+                  @*  @Html.Raw(item.Result.AboutDiv)*@
+
+                                            </div>
+
+
+                                        </div>
+					-->
+
+					<br />
+					@foreach (SearchEngine.API.Models.GenericGoogleResult Item in item.Result.genericGoogleResults)
+					{
+						<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41;
+color:white;
+    border: #6c6a7961 solid 0px;">
+
+
+							<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+								
+								<img src=@Url.Content("~/search.png")
+										 width="30px" height="30px" />
+								
+								
+
+							</div>
+
+							<div style="margin-left:50px">
+
+
+								<a target="_blank" href=@Item.Link>
+
+									<h4>@Item.Header</h4>
+								</a>
+
+
+								<p>
+									@Item.Description
+								</p>
+							</div>
+
+						</div>
+						<br />
+					}
+				
+				
+				}
+
+
 
 				if (item.Source == SearchEngine.API.Models.SearchResultType.Instagram_Twitter.ToString())
 				{
-					@foreach (SearchEngine.API.Models.InstagramAndTwitterResult Item in item.Result)
+					@foreach (SearchEngine.API.Models.GenericGoogleResult Item in item.Result)
 					{
 						<div style="    padding: 10px;
     border-radius: 20px;position:relative;

@@ -22,8 +22,10 @@
     Twitter,
         Google_Reviews,
         Wikipedia,
-        Instagram_Twitter
-    }
+        Instagram_Twitter,
+		
+        Google_Engine
+	}
     public enum GoogleReviewsType
     {
 
@@ -56,7 +58,7 @@
     }
 
 
-    public class InstagramAndTwitterResult
+    public class GenericGoogleResult
     {
 
 

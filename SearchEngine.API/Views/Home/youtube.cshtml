@@ -1,0 +1,90 @@
+﻿@using SearchEngine.API.Controllers;
+@using SearchEngine.API.Models;
+@model List<YoutubeResultModel>
+
+
+	<div class="container" style="background-color:blueviolet">
+
+    <br>
+    <div style="display :flex;background-color:#0000000a">
+        @foreach (var item in Enum.GetValues(typeof(SearchResultType)))
+        {
+            @*displying Types of results Google youtube twitter*@
+
+            <a href="@item?query=apple" class="btn btn-danger" style="padding:15px;border-radius:20px;">
+                @item
+            </a>
+        }
+
+
+    </div>
+    <hr>
+
+    @foreach (SearchEngine.API.Controllers.YoutubeResultModel youtubeItem in Model)
+    {
+        @switch (youtubeItem.ResultType)
+        {
+            case "Channel":
+                <div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+      background-color: #1d1d41;
+color:white;
+    border: #ff000061 solid 0px;">
+
+                    <div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+                        <img src=@Url.Content("~/youtube.png")
+                             width="30px" height="30px" />
+                    </div>
+                    <div style="margin-left:50px">
+                        <a target="_blank" href="https://www.youtube.com/channel/@youtubeItem.ChannelId">
+                            <h4>@youtubeItem.ChannelTitle</h4>
+                        </a>
+                        <p>@youtubeItem.ResultType</p>
+                        <p>@youtubeItem.PublishedAt</p>
+                        <p>@youtubeItem.ChannelDescription</p>
+                    </div>
+                </div>
+                break;
+            case "Video":
+                <div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41;
+color:white;
+    border: #ff000061 solid 0px;">
+
+                    <div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+                        <img src=@Url.Content("~/youtube.png") width="30px" height="30px" />
+                    </div>
+
+                    <div style="margin-left:50px">
+                        <a target="_blank" href="https://www.youtube.com/watch?v=@youtubeItem.VideoId">
+                            <h4>	@youtubeItem.VideoTitle</h4>
+                        </a>
+                        <p>@youtubeItem.ChannelTitle</p>
+                        <p>@youtubeItem.ResultType</p>
+                        <p>Likes  -@youtubeItem.VideoLikes  - Views  - @youtubeItem.VideoViews</p>
+                        <p>@youtubeItem.VideoTitle</p>
+                    </div>
+                </div>
+                break;
+            case "Playlist":
+                <div style="    padding: 10px;
+    border-radius: 20px;
+    /* background-color: red; */
+    border: #ff000061 solid 0px;">
+
+                    <img src=@Url.Content("~/youtube.png") width="30px" height="30px" />
+                    <div style="margin-left:50px">
+                        <h4>@youtubeItem.PlaylistTitle</h4>
+                        <p>@youtubeItem.ResultType</p>
+                        <p>@youtubeItem.PlaylistDesceription</p>
+
+                    </div>
+                </div>
+                break;
+        }
+
+        <br />
+    }
+	</div>
+
