@@ -5,7 +5,7 @@
 @model  List<SearchEngine.API.Models.SearchResult> 
 
 @{
-	Layout = "_Layout.cshtml";
+	Layout = "_Layout";
 }
 
 
@@ -17,15 +17,20 @@
 
 	<br>
 	<div style="width:70%;">
+
+
+
+
+
 		@if (Model != null)
 		{
 			<br>
-			<div style="display :flex;background-color:#0000000a">
+	<!--	<div style="display :flex;background-color:#0000000a">
 				@foreach (var item in Enum.GetValues(typeof(SearchResultType)))
 				{
 					@*displying Types of results Google youtube twitter*@
 
-							<a href="@item?query=apple" class="btn btn-danger" style="padding:15px;border-radius:20px;">
+							<a href="search?query=apple&source=Youtube" class="btn btn-danger" style="padding:15px;border-radius:20px;">
 								@item
 							</a>
 				}
@@ -33,6 +38,8 @@
 
 					</div>
 					<br>
+					-->
+
 			@foreach (SearchEngine.API.Models.SearchResult item in Model)
 			{
 
@@ -114,8 +121,15 @@ color:white;
 			
 				if (item.Source == SearchEngine.API.Models.SearchResultType.Google_Engine.ToString())
 				{
-			
-					<div style="display :flex;background-color:#0000000a">
+
+					<div style="display: flex;
+    background-color: #1a121212;
+    postition: absolute;
+    position: fixed;
+    bottom: 10%;
+    z-index: 999;
+    right: 20%;
+    left: 20%;">
 
 						@foreach (var itm in (Dictionary<string, string>)item.Result.Filters)
 						{
@@ -326,44 +340,7 @@ color:white;
 					}
 				}
 
-				if (item.Source == SearchEngine.API.Models.SearchResultType.Wikipedia.ToString())
-				{
-					@foreach (SearchEngine.API.Models.WikipediaResult wikiItem in item.Result)
-					{
-						<div style="    padding: 10px;
-    border-radius: 20px;position:relative;
-     background-color: #1d1d41;
-color:white;
-    border: #6c6a7961 solid 0px;">
-
-							<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
-								<img src=@Url.Content("~/wiki.png")
-				 width="30px" height="30px" />
-						
-				</div>
-
-						
-							<div style="margin-left:50px">
-							<a target="_blank" href="">
-								@if (wikiItem.ThumbImg != "")
-								{
-									
-									<img src="//@wikiItem.ThumbImg" />
-								}
-								<h4>@wikiItem.Title</h4>
-							</a>
-
-
-							<p>
-								@wikiItem.Description
-							</p>
-							</div>
-						</div>
-						<br />
-					}
-				}
-
-
+			
 
 
 			}
@@ -387,12 +364,28 @@ color:white;
 
 </div>
 <br />
-<div style="position:fixed;bottom:10px;    left: 30%;
-    right: 30%;">
+<div style="position:fixed;bottom:10px;    left:20%;
+    right: 20%;">
 
 
 	<form method="post" asp-action="Search" class="row" >
-		<input class="form-control" name="query" style="border-radius:50px" placeholder="What's on your mind ?"/>
+		<select name="source"  class="form-control " style=" border-radius:50px;width:20%">
+			
+
+			@foreach (var item in Enum.GetValues(typeof(SearchResultType)))
+			{
+				@*displying Types of results Google youtube twitter*@
+
+			@*	<a href="@item?query=apple" class="btn btn-danger" style="padding:15px;border-radius:20px;">
+					@item
+				</a>*@
+
+<option value="@item"   >@item</option>
+
+			}
+		</select>
+
+		<input class="form-control" name="query" style="width:80%; border-radius:50px" placeholder="What's on your mind ?"/>
 		@*<button class="btn btn-primary col-4" type="submit">Search</button>
 *@
 

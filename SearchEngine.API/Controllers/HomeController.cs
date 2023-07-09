@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using System.Reflection.PortableExecutable;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PuppeteerSharp;
@@ -125,10 +126,22 @@ namespace SearchEngine.API.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Search(string query)
+		public async Task<IActionResult> Search(string query,string source)
 		{
 
+			switch (source)
+			{
+				case  "Youtube":
+				return	RedirectToAction("Youtube",new { query=query});
 
+				case "Wikipedia":
+                    return RedirectToAction("Wikipedia", new { query= query });
+
+
+                default:
+		
+					break;
+			}
 
 			var browserFetcher = new BrowserFetcher();
 
@@ -137,7 +150,7 @@ namespace SearchEngine.API.Controllers
 
 			var browser = await Puppeteer.LaunchAsync(new LaunchOptions
 			{
-				Headless = false,
+				Headless = true,
 				DefaultViewport = null,
 				Args = args
 			});
@@ -159,10 +172,10 @@ namespace SearchEngine.API.Controllers
 				/////////////////////////////////////////////////
 				//////////////////////////////////////////////////
 				//GOOGLE Search TASK General
-				var googleTask = Task.Run(async () =>
+				//var googleTask = 
+					await
+					Task.Run(async () =>
 				{
-
-
 
 
 					using (var page = await browser.NewPageAsync())
@@ -484,176 +497,9 @@ namespace SearchEngine.API.Controllers
 
 								});
 
-								//WIKIPEDIA
-								var wikipediaTask = Task.Run(async () => {
+						
 
-							   using (var page = await browser.NewPageAsync())
-							   {
-
-								   await page.SetExtraHttpHeadersAsync(headers);
-								   await page.GoToAsync(APIs.WikiPedia_Endpoint);
-								   await page.SetViewportAsync(new ViewPortOptions() { IsLandscape = true, IsMobile = false });
-								   await page.TypeAsync(".cdx-text-input__input", query);
-								   await Task.Delay(5000);
-								   ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
-
-
-								   //await page.EvaluateExpressionAsync("window.scrollBy(0, window.innerHeight)")
-								   //   await page.ClickAsync("#searchbox-searchbutton");
-								   // await Task.Delay(10000);
-								   //        await page.WaitForXPathAsync("/html/body/c-wiz[2]/div/div/c-wiz/c-wiz/c-wiz/section/div/div/div");
-								   var content = await page.GetContentAsync();
-								   HtmlDocument htmlDocument = new();
-								   htmlDocument.LoadHtml(content);
-
-								   var resultsListDiv = htmlDocument.DocumentNode.Descendants()
-										.Where(y => y.Id == "cdx-typeahead-search-menu-0").FirstOrDefault();
-									 if (resultsListDiv!=null) {
-										 foreach (var item in resultsListDiv.ChildNodes.ToList())
-										 {
-											 if (!String.IsNullOrEmpty(item.InnerText) && item.Name == "li")
-											 {
-
-												 try
-												 {
-
-													 var ImageLink = "";
-													 try
-													 {
-														 ImageLink = item.ChildNodes[0].ChildNodes[0].ChildNodes[1].Attributes["style"].DeEntitizeValue.Replace("background-image", "").Replace("url(\"", "").Replace("\")", "").Replace(": //", "").Replace(";", "");
-
-													 }
-													 catch (Exception)
-													 {
-
-
-													 }
-													 var Desc = item.ChildNodes[0].ChildNodes[1].ChildNodes[3].InnerText;
-													 var Title = item.ChildNodes[0].ChildNodes[1].ChildNodes[0].InnerText;
-
-
-													 wikipediaResults.Add(new WikipediaResult()
-													 {
-														 Title = Title,
-														 Description = Desc,
-														 ThumbImg = ImageLink,
-														 ArticleLink = "https://en.wikipedia.org/wiki/" + Title.Trim().Replace(" ", "_")
-													 });
-
-
-
-
-												 }
-												 catch (Exception e)
-												 {
-													 continue;
-
-												 }
-
-
-
-
-
-											 }
-										 }
-									 }
-								   await page.CloseAsync();
-
-
-							   }
-
-
-
-
-						   });
-
-								/// YOUTUBE
-								var youtubeTask = Task.Run(async () => {
-						 HttpClient client = new HttpClient();
-						 client.BaseAddress = new Uri(APIs.Youtube_Endpoint);
-						 client.DefaultRequestHeaders.Clear();
-						 var requestUri = "search?q=" + query + "&max_results=10&part=snippet&key=" + Keys.Youtube_API_KEY;
-						 var res = client.GetAsync(requestUri).GetAwaiter().GetResult();
-						 var result = res.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-						 var re = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(result);
-						 var finalresult = re["items"];
-
-						 foreach (var item in finalresult)
-						 {
-							 var youtubeResult = new YoutubeResultModel();
-
-							 string kind = item["id"]["kind"];
-
-							 switch (kind.ToLower().Replace("youtube#", ""))
-							 {
-								 case "channel":
-									 youtubeResult.ChannelId = item["id"]["channelId"];
-									 youtubeResult.ChannelTitle = item["snippet"]["title"];
-
-									 youtubeResult.PublishedAt = item["snippet"]["publishedAt"];
-									 youtubeResult.ChannelDescription = item["snippet"]["description"];
-
-									 youtubeResult.ResultType = YoutubeResultTypes.Channel.ToString();
-									 break;
-
-								 case "video":
-									 youtubeResult.VideoId = item["id"]["videoId"];
-									 youtubeResult.ResultType = YoutubeResultTypes.Video.ToString();
-									 var videoRequestUri =
-										 APIs.Youtube_Endpoint
-										 + "videos?key="
-										 + Keys.Youtube_API_KEY
-										 + "&part=snippet,statistics&id="
-										 + item["id"]["videoId"];
-									 var responseObj = client.GetAsync(videoRequestUri).GetAwaiter().GetResult();
-									 var reslt = responseObj.Content
-										 .ReadAsStringAsync()
-										 .GetAwaiter()
-										 .GetResult();
-									 var responseJson = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(reslt);
-									 youtubeResult.PublishedAt = responseJson["items"][0]["snippet"]["publishedAt"];
-									 youtubeResult.VideoDescription = responseJson["items"][0]["snippet"][
-										 "description"
-									 ];
-									 youtubeResult.VideoTitle = responseJson["items"][0]["snippet"]["title"];
-									 youtubeResult.ChannelId = responseJson["items"][0]["snippet"]["channelId"];
-									 youtubeResult.ChannelTitle = responseJson["items"][0]["snippet"][
-										 "channelTitle"
-									 ];
-
-									 youtubeResult.VideoViews = responseJson["items"][0]["statistics"][
-										 "viewCount"
-									 ];
-									 youtubeResult.VideoLikes = responseJson["items"][0]["statistics"][
-										 "likeCount"
-									 ];
-									 youtubeResult.VideoComments = responseJson["items"][0]["statistics"][
-										 "commentCount"
-									 ];
-
-									 break;
-
-								 case "playlist":
-									 youtubeResult.PlaylistId = item["id"]["playlistId"];
-
-									 youtubeResult.PlaylistTitle = item["snippet"]["title"];
-									 youtubeResult.ChannelId = item["snippet"]["channelId"];
-
-									 youtubeResult.PublishedAt = item["snippet"]["publishedAt"];
-									 youtubeResult.PlaylistDesceription = item["snippet"]["description"];
-									 youtubeResult.ResultType = YoutubeResultTypes.Playlist.ToString();
-									 break;
-
-								 default:
-									 break;
-							 }
-
-							 youtubeList.Add(youtubeResult);
-						 }
-
-
-					 });
-
+							
 								/// GOOGLE NEWS
 								var googleNewsTask = Task.Run(async () => {
 
@@ -724,10 +570,10 @@ namespace SearchEngine.API.Controllers
 								*/
 
 
-				Task.WaitAll(googleTask); // googlePlaceTask, googleplayTask, twitterTask,instagramTask, wikipediaTask, youtubeTask, googleNewsTask);
+//				Task.WaitAll( // googlePlaceTask, googleplayTask, twitterTask,instagramTask, wikipediaTask, youtubeTask, googleNewsTask);
 
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 
 
@@ -762,7 +608,106 @@ namespace SearchEngine.API.Controllers
 
 
 
+		public async Task<ActionResult> Wikipedia(string query) 
+		{
+		var	 wikipediaResults =new List<WikipediaResult>();
+            var browserFetcher = new BrowserFetcher();
 
+            await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+            string[] args = { "--no-sandbox" };
+
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true,
+                DefaultViewport = null,
+                Args = args
+            });
+
+            //WIKIPEDIA
+           await Task.Run(async () => {
+
+                using (var page = await browser.NewPageAsync())
+				{
+
+                   // await page.SetExtraHttpHeadersAsync(headers);
+                    await page.GoToAsync(APIs.WikiPedia_Endpoint);
+                    await page.SetViewportAsync(new ViewPortOptions() { IsLandscape = true, IsMobile = false });
+                    await page.TypeAsync(".cdx-text-input__input", query);
+                    await Task.Delay(5000);
+                    ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
+
+
+                    //await page.EvaluateExpressionAsync("window.scrollBy(0, window.innerHeight)")
+                    //   await page.ClickAsync("#searchbox-searchbutton");
+                    // await Task.Delay(10000);
+                    //        await page.WaitForXPathAsync("/html/body/c-wiz[2]/div/div/c-wiz/c-wiz/c-wiz/section/div/div/div");
+                    var content = await page.GetContentAsync();
+                    HtmlDocument htmlDocument = new();
+                    htmlDocument.LoadHtml(content);
+
+                    var resultsListDiv = htmlDocument.DocumentNode.Descendants()
+                         .Where(y => y.Id == "cdx-typeahead-search-menu-0").FirstOrDefault();
+                    if (resultsListDiv != null)
+                    {
+                        foreach (var item in resultsListDiv.ChildNodes.ToList())
+                        {
+                            if (!String.IsNullOrEmpty(item.InnerText) && item.Name == "li")
+                            {
+
+                                try
+                                {
+
+                                    var ImageLink = "";
+                                    try
+                                    {
+                                        ImageLink = item.ChildNodes[0].ChildNodes[0].ChildNodes[1].Attributes["style"].DeEntitizeValue.Replace("background-image", "").Replace("url(\"", "").Replace("\")", "").Replace(": //", "").Replace(";", "");
+
+                                    }
+                                    catch (Exception)
+                                    {
+
+
+                                    }
+                                    var Desc = item.ChildNodes[0].ChildNodes[1].ChildNodes[3].InnerText;
+                                    var Title = item.ChildNodes[0].ChildNodes[1].ChildNodes[0].InnerText;
+
+
+                                    wikipediaResults.Add(new WikipediaResult()
+                                    {
+                                        Title = Title,
+                                        Description = Desc,
+                                        ThumbImg = ImageLink,
+                                        ArticleLink = "https://en.wikipedia.org/wiki/" + Title.Trim().Replace(" ", "_")
+                                    });
+
+
+
+
+                                }
+                                catch (Exception e)
+                                {
+                                    continue;
+
+                                }
+
+
+
+
+
+                            }
+                        }
+                    }
+                    await page.CloseAsync();
+
+
+                }
+
+
+
+
+            });
+			return View(wikipediaResults);
+        }
 
 
 

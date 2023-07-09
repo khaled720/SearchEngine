@@ -14,17 +14,18 @@
 
 
     public enum SearchResultType {
-    
-    Youtube,
+      
+     Google_Engine
+    ,Youtube,
     Google_News,
     Tiktok,
     Instagram,
     Twitter,
-        Google_Reviews,
-        Wikipedia,
-        Instagram_Twitter,
+     Google_Reviews,
+     Wikipedia,
+     Instagram_Twitter
 		
-        Google_Engine
+   
 	}
     public enum GoogleReviewsType
     {
