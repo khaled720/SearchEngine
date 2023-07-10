@@ -2,15 +2,16 @@
 @{
     ViewData["Title"] = "Wikipedia";
     Layout="_Layout";
+
 }
 @using SearchEngine.API.Models
 @model List<WikipediaResult>
 <h1>Wikipedia</h1>
 
+<div style="display:flex;justify-content:center;flex-direction:column;    align-items: center;">
 
 
-	if (item.Source == SearchEngine.API.Models.SearchResultType.Wikipedia.ToString())
-				{
+
 					@foreach (WikipediaResult wikiItem in Model)
 					{
 						<div style="    padding: 10px;
@@ -44,5 +45,6 @@ color:white;
 						</div>
 						<br />
 					}
-				}
+				
 
+</div>

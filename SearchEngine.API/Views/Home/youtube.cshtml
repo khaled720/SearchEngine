@@ -2,11 +2,20 @@
 @using SearchEngine.API.Models;
 @model List<YoutubeResultModel>
 
+@{
 
-	<div class="container" style="background-color:blueviolet">
+    Layout = "_Layout";
+
+}
+
+
+<div style=" display:flex;justify-content:center;flex-direction:column;    align-items: center;background-color:#191935">
+
+
+	<div  style="width:70% ;">
 
     <br>
-    <div style="display :flex;background-color:#0000000a">
+    <div style="flex-wrap:wrap;display :flex;background-color:#0000000a">
         @foreach (var item in Enum.GetValues(typeof(SearchResultType)))
         {
             @*displying Types of results Google youtube twitter*@
@@ -87,4 +96,6 @@ color:white;
         <br />
     }
 	</div>
+
+    </div >
 
