@@ -1,0 +1,73 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@using SearchEngine.API.Controllers ;
+
+
+@model List<GoogleReviewResult>
+@{
+
+	Layout = "_Layout";
+
+}
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:20px;grid-gap:5px; background:transparent">
+
+
+
+@foreach(GoogleReviewResult reviewItem in Model)
+{
+	if (string.IsNullOrEmpty(reviewItem.Title)) continue;
+	<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41;
+color:white;
+    border: #6c6a7961 solid 0px;">
+		<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+			@if (reviewItem.Type == "Place")
+			{
+				<img src=@Url.Content("~/map.png")
+					 width="30px" height="30px" />
+			}
+			else
+			{
+
+				<img src=@Url.Content("~/google-play.png")
+					 width="30px" height="30px" />
+			}
+		</div>
+
+		<div style="margin-left:50px">
+			<a target="_blank" href="">
+				@if (reviewItem.Type == "Apps_Games")
+				{
+					
+			
+				<div style="background-image: url('@reviewItem.ImageLink') ;
+						 width: 100px;
+						height:100px;
+background-repeat:no-repeat;
+background-size:contain;
+						 border-radius: 10px;">
+				</div>
+                }
+				<h4>@reviewItem.Title</h4>
+			</a>
+
+
+			<p>
+				@reviewItem.Rate  <img src="~/star.png" width="15" height="15" />
+				@if (reviewItem.Type == "Place")
+				{
+					<span>@reviewItem.ReviewsNumber  Reviews</span>
+				}
+			</p>
+
+		</div>
+	</div>
+}
+
+
+				</div>

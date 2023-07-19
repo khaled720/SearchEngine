@@ -6,7 +6,7 @@
 }
 @using SearchEngine.API.Models
 @model List<WikipediaResult>
-<h1>Wikipedia</h1>
+<h1 style="color:white">Wikipedia</h1>
 
 <div style="display:flex;justify-content:center;flex-direction:column;    align-items: center;">
 
@@ -17,7 +17,7 @@
 						<div style="    padding: 10px;
     border-radius: 20px;position:relative;
      background-color: #1d1d41;
-color:white;
+color:white;width:70%;margin-bottom:10px;
     border: #6c6a7961 solid 0px;">
 
 							<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
@@ -31,9 +31,22 @@ color:white;
 							<a target="_blank" href="">
 								@if (wikiItem.ThumbImg != "")
 								{
-									
-									<img src="//@wikiItem.ThumbImg" />
+						     <div style="background-image: url('//@wikiItem.ThumbImg') ;
+						 width: 100px;
+						 height: 80%;
+						 position: absolute;
+						 right: 10px;
+background-repeat:no-repeat;
+background-size:contain;
+						 border-radius: 10px;">
+
+
+
+								</div>
 								}
+
+               
+
 								<h4>@wikiItem.Title</h4>
 							</a>
 
@@ -43,7 +56,8 @@ color:white;
 							</p>
 							</div>
 						</div>
-						<br />
+	
+
 					}
 				
 

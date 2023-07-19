@@ -2,18 +2,25 @@
 @using SearchEngine.API.Models;
 
 
-@model  List<SearchEngine.API.Models.SearchResult> 
+@model  SearchEngine.API.Models.SearchResult
 
 @{
 	Layout = "_Layout";
 }
 
 
-<div style="display:flex;justify-content:center;flex-direction:column;    align-items: center;">
+<div style="display:flex;justify-content:center;flex-direction:column;   align-items: center;">
 
+	@if (@Model !=null)
+	{
+		<h5 style="color:white">
+            You are Searching For<span style="color:blue">
+                @Model.Result.Query
+			</span>
+		</h5>
 
-
-
+	}
+	
 
 	<br>
 	<div style="width:70%;">
@@ -40,100 +47,29 @@
 					<br>
 					-->
 
-			@foreach (SearchEngine.API.Models.SearchResult item in Model)
+		@*	@foreach (SearchEngine.API.Models.SearchResult item in Model)
 			{
+*@
 
 
 
-
-				if (item.Source == SearchEngine.API.Models.SearchResultType.Youtube.ToString())
-				{
-
-					@foreach (SearchEngine.API.Controllers.YoutubeResultModel youtubeItem in item.Result)
-					{
-						@switch (youtubeItem.ResultType)
-						{
-							case "Channel":
-								<div style="    padding: 10px;
-    border-radius: 20px;position:relative;
-      background-color: #1d1d41;
-color:white;
-    border: #ff000061 solid 0px;">
-
-									<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
-										<img src=@Url.Content("~/youtube.png")
-									width="30px" height="30px" />
-									</div>
-									<div style="margin-left:50px">
-									<a  target="_blank" href="https://www.youtube.com/channel/@youtubeItem.ChannelId">
-										<h4>@youtubeItem.ChannelTitle</h4>
-									</a>	
-									<p>@youtubeItem.ResultType</p>
-									<p>@youtubeItem.PublishedAt</p>
-									<p>@youtubeItem.ChannelDescription</p>
-									</div>
-								</div>
-								break;
-							case "Video":
-								<div style="    padding: 10px;
-    border-radius: 20px;position:relative;
-     background-color: #1d1d41; 
-color:white;
-    border: #ff000061 solid 0px;">
-
-									<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
-									<img src =@Url.Content("~/youtube.png") width="30px" height="30px" />
-								</div>
-												
-							<div style="margin-left:50px">
-								<a target="_blank" href="https://www.youtube.com/watch?v=@youtubeItem.VideoId">
-										<h4>	@youtubeItem.VideoTitle</h4>
-									</a>
-									<p>@youtubeItem.ChannelTitle</p>
-									<p>@youtubeItem.ResultType</p>
-									<p>Likes  -@youtubeItem.VideoLikes  - Views  - @youtubeItem.VideoViews</p>
-									<p>@youtubeItem.VideoTitle</p>
-									</div>
-								</div>
-								break;
-							case "Playlist":
-								<div style="    padding: 10px;
-    border-radius: 20px;
-    /* background-color: red; */
-    border: #ff000061 solid 0px;"
-								>
-
-									<img src=@Url.Content("~/youtube.png")  width="30px" height="30px" />
-									<div style="margin-left:50px">
-									<h4>@youtubeItem.PlaylistTitle</h4>
-									<p>@youtubeItem.ResultType</p>
-									<p>@youtubeItem.PlaylistDesceription</p>
-
-									</div>
-								</div>
-								break;
-						}
-
-						<br />
-					}
-
-				}
-			
-				if (item.Source == SearchEngine.API.Models.SearchResultType.Google_Engine.ToString())
+		
+				@if(Model.Source == SearchEngine.API.Models.SearchResultType.Google_Engine.ToString())
 				{
 
 					<div style="display: flex;
     background-color: #1a121212;
-    postition: absolute;
+  
     position: fixed;
     bottom: 10%;
     z-index: 999;
     right: 20%;
     left: 20%;">
 
-						@foreach (var itm in (Dictionary<string, string>)item.Result.Filters)
+						@foreach (var itm in (Dictionary<string, string>)Model.Result.Filters)
 						{
-							<a href="@itm.Value" class="btn btn-primary" style="padding:15px;border-radius:20px;">
+						<a href="#" 
+						class="btn btn-primary" style="padding:15px;border-radius:20px;">
 								@itm.Key
 							</a>
 						}
@@ -173,7 +109,7 @@ color:white;
 					-->
 
 					<br />
-					@foreach (SearchEngine.API.Models.GenericGoogleResult Item in item.Result.genericGoogleResults)
+				@foreach (SearchEngine.API.Models.GenericGoogleResult Item in Model.Result.genericGoogleResults)
 					{
 						<div style="    padding: 10px;
     border-radius: 20px;position:relative;
@@ -211,150 +147,7 @@ color:white;
 				
 				
 				}
-
-
-
-				if (item.Source == SearchEngine.API.Models.SearchResultType.Instagram_Twitter.ToString())
-				{
-					@foreach (SearchEngine.API.Models.GenericGoogleResult Item in item.Result)
-					{
-						<div style="    padding: 10px;
-    border-radius: 20px;position:relative;
-     background-color: #1d1d41; 
-color:white;
-    border: #6c6a7961 solid 0px;">
-
-				
-				<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
-								@if (Item.Type == "Instagram")
-								{
-									<img src=@Url.Content("~/instagram.png")
-					 width="30px" height="30px" />
-								}
-								else
-								{
-									<img src=@Url.Content("~/twitter.png")
-					 width="30px" height="30px" />
-								}
-
-				</div>
-
-					<div style="margin-left:50px">
-
-
-							<a target="_blank" href=@Item.Link >
-							
-								<h4>@Item.Header</h4>
-							</a>
-
-
-							<p>
-								@Item.Description
-							</p>
-							</div>
-
-						</div>
-						<br />
-					}
-				}
-				if (item.Source == SearchEngine.API.Models.SearchResultType.Google_News.ToString())
-				{
-					@foreach (SearchEngine.API.Controllers.NewsModel newsItem in item.Result)
-					{
-						<div style="    padding: 10px;
-    border-radius: 20px;position:relative;
-     background-color: #1d1d41; 
-color:white;
-    border: #6c6a7961 solid 0px;">
-
-							<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
-							<img src=@Url.Content("~/google.png")
-				 width="30px" height="30px" />
-				 </div>
-				
-				
-
-							<div style="margin-left:50px">
-
-								<a target="_blank" href="@newsItem.SourceLink">
-
-									<h4>@newsItem.Title</h4>
-								</a>
-
-								<p>
-									@newsItem.Description
-								</p>
-								<p>
-									@newsItem.Source
-								</p>
-
-							</div>
-
-						</div>
-						<br />
-					}
-				}
-
-				if (item.Source == SearchEngine.API.Models.SearchResultType.Google_Reviews.ToString())
-				{
-					@foreach (SearchEngine.API.Models.GoogleReviews reviewItem in item.Result)
-					{
-						if (string.IsNullOrEmpty(reviewItem.Title)) continue;
-						<div style="    padding: 10px;
-    border-radius: 20px;position:relative;
-     background-color: #1d1d41;
-color:white;
-    border: #6c6a7961 solid 0px;">
-							<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
-							@if (reviewItem.Type == "Place") { 
-										<img src=@Url.Content("~/map.png")
-				 width="30px" height="30px" />
-							}else{
-
-								<img src=@Url.Content("~/google-play.png")
-				 width="30px" height="30px" />
-							}
-				</div>
-
-							<div style="margin-left:50px">
-							<a target="_blank" href="">
-								@if (reviewItem.Type == "Apps_Games")
-								{
-									<img src=@reviewItem.ImageLink
-					 />
-								}
-								<h4>@reviewItem.Title</h4>
-							</a>
-
-						
-							<p>
-								@reviewItem.Rate  <img src="~/star.png" width="15" height="15" />  
-								@if(reviewItem.Type == "Place"){
-							<span>@reviewItem.ReviewsNumber  Reviews</span>
-								}
-						</p>
-
-								</div >
-						</div>
-						<br />
-					}
-				}
-
-			
-
-
-			}
-
-
-
-
-
-
-
-
-
-
-
+		@*	}*@
 
 
 
@@ -362,8 +155,14 @@ color:white;
 
 	</div>
 
+
+
 </div>
 <br />
+
+
+
+
 <div style="position:fixed;bottom:10px;    left:20%;
     right: 20%;">
 

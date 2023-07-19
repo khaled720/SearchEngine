@@ -23,7 +23,7 @@ namespace SearchEngine.API.Controllers
 
         public List<GenericGoogleResult> genericGoogleResults { get; set; } = new List<GenericGoogleResult>();
 
-        public string Query { get; set; } 
+        public string Query { get; set; } = "";
 
     }
 }

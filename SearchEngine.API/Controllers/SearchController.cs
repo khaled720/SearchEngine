@@ -238,7 +238,9 @@ namespace SearchEngine.API.Controllers
         public string? VideoViews { get; set; }
         public string? VideoLikes { get; set; }
 
-        public string? PlaylistId { get; set; }
+		public string? VideoThumbImage { get; set; }
+
+		public string? PlaylistId { get; set; }
         public string? PlaylistTitle { get; set; }
         public string? PlaylistDesceription { get; set; }
 

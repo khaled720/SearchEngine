@@ -48,13 +48,16 @@ color:white;
                         <a target="_blank" href="https://www.youtube.com/channel/@youtubeItem.ChannelId">
                             <h4>@youtubeItem.ChannelTitle</h4>
                         </a>
-                        <p>@youtubeItem.ResultType</p>
-                        <p>@youtubeItem.PublishedAt</p>
+                        <p>@youtubeItem.ResultType - Created at @youtubeItem.PublishedAt</p>
+                       
                         <p>@youtubeItem.ChannelDescription</p>
                     </div>
                 </div>
                 break;
-            case "Video":
+       
+                
+                
+                case "Video":
                 <div style="    padding: 10px;
     border-radius: 20px;position:relative;
      background-color: #1d1d41;
@@ -67,15 +70,27 @@ color:white;
 
                     <div style="margin-left:50px">
                         <a target="_blank" href="https://www.youtube.com/watch?v=@youtubeItem.VideoId">
-                            <h4>	@youtubeItem.VideoTitle</h4>
+                             @*   <div style="width:100%;display:flex;justify-content:center ">
+                                    <img src="@youtubeItem.VideoThumbImage" width="100%"; style="border-radius:20px">
+                                </div>*@
+                                <iframe width="100%" style="border-radius:20px" height="345" src="https://www.youtube.com/embed/@youtubeItem.VideoId">
+                                </iframe>
+                                
+                                <h4>	@youtubeItem.VideoTitle</h4>
                         </a>
                         <p>@youtubeItem.ChannelTitle</p>
-                        <p>@youtubeItem.ResultType</p>
+                        <p>@youtubeItem.ResultType - published at @youtubeItem.PublishedAt</p>
                         <p>Likes  -@youtubeItem.VideoLikes  - Views  - @youtubeItem.VideoViews</p>
-                        <p>@youtubeItem.VideoTitle</p>
-                    </div>
+
+                           
+
+                        </div>
+
+                    
                 </div>
+                
                 break;
+
             case "Playlist":
                 <div style="    padding: 10px;
     border-radius: 20px;
