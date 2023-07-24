@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using SearchEngine.API.Models;
+using SearchEngineWeb;
+using SearchEngineWeb.Models;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -180,28 +181,28 @@ namespace SearchEngine.API.Controllers
             ////   var result3 = await res.Content.ReadAsStringAsync();
             var respons = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(result3);
             List<TwitteModel> TwittesList = new();
-            foreach (var item in respons["data"])
-            {
-                var Twitte = new TwitteModel();
-                Twitte.Text = item["text"];
-                Twitte.AuthorId = item["author_id"];
-                Twitte.CreatedAt = item["created_at"];
-                Twitte.Id = item["id"];
+            //foreach (var item in respons["data"])
+            //{
+            //    var Twitte = new TwitteModel();
+            //    Twitte.Text = item["text"];
+            //    Twitte.AuthorId = item["author_id"];
+            //    Twitte.CreatedAt = item["created_at"];
+            //    Twitte.Id = item["id"];
 
-                foreach (var user in respons["includes"]["users"])
-                {
-                    if (user["id"] == item["author_id"])
-                    {
-                        Twitte.TwitteUser = new();
-                        Twitte.TwitteUser.Id = user["id"];
-                        Twitte.TwitteUser.Description = user["description"];
-                        Twitte.TwitteUser.Name = user["name"];
-                        Twitte.TwitteUser.Username = user["username"];
-                    }
-                }
+            //    foreach (var user in respons["includes"]["users"])
+            //    {
+            //        if (user["id"] == item["author_id"])
+            //        {
+            //            Twitte.TwitteUser = new();
+            //            Twitte.TwitteUser.Id = user["id"];
+            //            Twitte.TwitteUser.Description = user["description"];
+            //            Twitte.TwitteUser.Name = user["name"];
+            //            Twitte.TwitteUser.Username = user["username"];
+            //        }
+            //    }
 
-                TwittesList.Add(Twitte);
-            }
+            //    TwittesList.Add(Twitte);
+            //}
 
             SearchResult searchResult = new SearchResult();
             searchResult.Source = SearchResultType.Google_News.ToString();

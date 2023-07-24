@@ -1,4 +1,4 @@
-﻿namespace SearchEngine.API.Controllers
+﻿namespace SearchEngineWeb.Models
 {
     public class NewsModel
     {

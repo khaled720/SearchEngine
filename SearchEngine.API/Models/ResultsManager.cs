@@ -1,8 +1,10 @@
 ﻿using System.Xml;
 using Newtonsoft.Json;
+using SearchEngine.API;
 using SearchEngine.API.Controllers;
+using SearchEngineWeb.Models;
 
-namespace SearchEngine.API.Models
+namespace SearchEngineWeb.Models
 {
     public class ResultsManager
     {

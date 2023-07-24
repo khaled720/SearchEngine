@@ -1,0 +1,72 @@
+﻿@using SearchEngineWeb.Models;
+@model List<GenericGoogleResult>
+
+
+
+
+
+<div style=" display:flex;justify-content:center;flex-direction:column;    align-items: center;background-color:#191935">
+
+
+	<div style="width:70% ;">
+		<br>
+		<div style="display :flex;background-color:#0000000a">
+			@foreach (var item in Enum.GetValues(typeof(SearchResultType)))
+			{
+				@*displying Types of results Google youtube twitter*@
+
+				<a href="@item?query=apple" class="btn btn-danger" style="padding:15px;border-radius:20px;">
+					@item
+				</a>
+			}
+
+
+		</div>
+		<hr>
+
+
+		@foreach (SearchEngineWeb.Models.GenericGoogleResult Item in Model)
+		{
+			<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41;
+color:white;
+    border: #6c6a7961 solid 0px;">
+
+
+				<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+					@if (Item.Type == "Instagram")
+					{
+						<img src=@Url.Content("~/instagram.png")
+							 width="30px" height="30px" />
+					}
+					else
+					{
+						<img src=@Url.Content("~/twitter.png")
+							 width="30px" height="30px" />
+					}
+
+				</div>
+
+				<div style="margin-left:50px">
+
+
+					<a target="_blank" href=@Item.Link>
+
+						<h4>@Item.Header</h4>
+					</a>
+
+
+					<p>
+						@Item.Description
+					</p>
+				</div>
+
+			</div>
+			<br />
+		}
+
+	</div>
+
+</div>
+

@@ -1,0 +1,63 @@
+﻿@using SearchEngineWeb.Models;
+
+@model List<WikipediaResult>
+
+
+
+<div style="display:flex;justify-content:center;flex-direction:column;    align-items: center;">
+
+
+
+	@foreach (WikipediaResult wikiItem in Model)
+	{
+		<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41;
+color:white;width:70%;margin-bottom:10px;
+    border: #6c6a7961 solid 0px;">
+
+			<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+				<img src=@Url.Content("~/wiki.png")
+					 width="30px" height="30px" />
+
+			</div>
+
+
+			<div style="margin-left:50px">
+				<a target="_blank" href="">
+					@if (wikiItem.ThumbImg != "")
+					{
+						<div style="background-image: url('//@wikiItem.ThumbImg') ;
+						 width: 100px;
+						 height: 80%;
+						 position: absolute;
+						 right: 10px;
+background-repeat:no-repeat;
+background-size:contain;
+						 border-radius: 10px;">
+						</div>
+					}
+
+
+
+					<h4>@wikiItem.Title</h4>
+				</a>
+
+
+				<p>
+					@wikiItem.Description
+				</p>
+			</div>
+		</div>
+
+
+	}
+
+
+</div>
+
+
+
+
+
+

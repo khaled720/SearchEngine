@@ -1,6 +1,6 @@
-﻿using SearchEngine.API.Models;
+﻿using SearchEngineWeb.Models;
 
-namespace SearchEngine.API.Controllers
+namespace SearchEngineWeb.Models
 {
     public class GoogleEngineResult
     {
@@ -8,9 +8,9 @@ namespace SearchEngine.API.Controllers
         public List<string> Images { get; set; }
 
 
-       //key is name 
-       //value is link to that filter
-        public Dictionary<string, string> Filters { get; set; } =new Dictionary<string, string>();
+        //key is name 
+        //value is link to that filter
+        public Dictionary<string, string> Filters { get; set; } = new Dictionary<string, string>();
 
 
         public string Description { get; set; }

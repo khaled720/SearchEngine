@@ -1,0 +1,160 @@
+﻿@using SearchEngineWeb.Models;
+@model SearchEngineWeb.Models.SearchResult
+
+
+
+
+<div style="display:flex;justify-content:center;flex-direction:column;   align-items: center;">
+
+	@if (@Model != null)
+	{
+		<h5 style="color:white">
+			You are Searching For<span style="color:blue">
+				@Model.Result.Query
+			</span>
+		</h5>
+
+	}
+
+
+	<br>
+	<div style="width:70%;">
+
+
+
+
+
+		@if (Model != null)
+		{
+			<br>
+			<!--	<div style="display :flex;background-color:#0000000a">
+			@foreach (var item in Enum.GetValues(typeof(SearchResultType)))
+			{
+				@*displying Types of results Google youtube twitter*@
+
+										<a href="@item?query=apple" class="btn btn-danger" style="padding:15px;border-radius:20px;">
+					@item
+										</a>
+			}
+
+
+							</div>
+							<br>
+							-->
+			@*	@foreach (SearchEngine.API.Models.SearchResult item in Model)
+		{
+		*@
+
+
+
+
+			@if (Model.Source == SearchEngineWeb.Models.SearchResultType.Google_Engine.ToString())
+			{
+
+				<div style="display: flex;
+    background-color: #1a121212;
+
+    position: fixed;
+    bottom: 10%;
+    z-index: 999;
+    right: 20%;
+    left: 20%;">
+
+					@foreach (var itm in (Dictionary<string, string>)Model.Result.Filters)
+					{
+						<a href="#"
+						   class="btn btn-primary" style="padding:15px;border-radius:20px;">
+							@itm.Key
+						</a>
+					}
+
+
+				</div>
+				<hr>
+
+
+				<!--
+
+				   <div style="    padding: 10px;
+					  border-radius: 20px;position:relative;
+					   background-color: #1d1d90;
+				  color:white;width:80%;
+					  border: #6c6a7961 solid 0px;">
+
+
+										  <div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+
+				@*<img src=@Url.Content("~/twitter.png")
+								   width="30px" height="30px" />*@
+
+
+										  </div>
+
+
+										  <div style="margin-left:50px">
+
+
+				@*  @Html.Raw(item.Result.AboutDiv)*@
+
+										  </div>
+
+
+									  </div>
+				  -->
+
+				<br />
+				@foreach (SearchEngineWeb.Models.GenericGoogleResult Item in Model.Result.genericGoogleResults)
+				{
+					<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41;
+color:white;
+    border: #6c6a7961 solid 0px;">
+
+
+						<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+
+							<img src=@Url.Content("~/search.png")
+								 width="30px" height="30px" />
+
+
+
+						</div>
+
+						<div style="margin-left:50px">
+
+
+							<a target="_blank" href=@Item.Link>
+
+								<h4>@Item.Header</h4>
+							</a>
+
+
+							<p>
+								@Item.Description
+							</p>
+						</div>
+
+					</div>
+					<br />
+				}
+
+
+			}
+			@*	}*@
+
+
+
+		}
+
+	</div>
+
+
+
+</div>
+
+
+
+
+
+

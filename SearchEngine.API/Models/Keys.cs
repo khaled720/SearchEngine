@@ -1,4 +1,4 @@
-﻿namespace SearchEngine.API
+﻿namespace SearchEngineWeb
 {
     public class Keys
     {

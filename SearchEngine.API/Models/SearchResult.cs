@@ -1,4 +1,4 @@
-﻿namespace SearchEngine.API.Models
+﻿namespace SearchEngineWeb.Models
 {
     public class SearchResult
     {

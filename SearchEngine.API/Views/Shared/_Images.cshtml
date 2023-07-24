@@ -1,0 +1,61 @@
+﻿@using SearchEngineWeb.Models;
+@model SearchEngineWeb.Models.SearchResult
+
+
+
+
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr ;padding:20px;grid-gap:5px; background:transparent">
+
+
+
+	@foreach (var ImageItem in Model.Result.Images)
+	{
+
+		<div style="    padding: 10px;
+    border-radius: 20px;position:relative;
+     background-color: #1d1d41;
+color:white;
+    border: #6c6a7961 solid 0px;">
+			@*<div style="position:absolute;left:5px;top:35%;border-radius:25px;padding:10px;border:#302faf 1px solid;">
+		@if (reviewItem.Type == "Place")
+		{
+		<img src=@Url.Content("~/map.png")
+		width="30px" height="30px" />
+		}
+		else
+		{
+
+		<img src=@Url.Content("~/google-play.png")
+		width="30px" height="30px" />
+		}
+		</div>*@
+
+
+
+			@*
+		<div style="background-image: url('') ;
+		width: 100px;
+		height:100px;
+		background-repeat:no-repeat;
+		background-size:contain;
+		">
+		</div>*@
+			<img src="@ImageItem" style=" border-radius: 10px;margin:10px" />
+
+
+
+
+
+		</div>
+
+	}
+
+
+</div>
+
+
+
+
+
+
