@@ -11,15 +11,30 @@
 <h1>All</h1>
 
 
-@*
-@await Html.PartialAsync("_google",Model.Where(y=>y.SourceID==(int)SearchResultType.Google_Engine).First())*@
-@*
+
+@await Html.PartialAsync("_google",Model.Where(y=>y.SourceID==(int)SearchResultType.Google_Engine).First())
+
 @await Html.PartialAsync("_Images",Model.Where(y=>y.SourceID==(int)SearchResultType.Images).First())
-*@
+
 @await Html.PartialAsync("_youtube",(List<YoutubeResultModel>)Model.Where(y=>y.SourceID==(int)SearchResultType.Youtube).First().Result)
-@*@await Html.PartialAsync("_reviews",(List<GoogleReviewResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Google_Reviews).First().Result)
-*@
+@await Html.PartialAsync("_reviews",(List<GoogleReviewResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Google_Reviews).First().Result)
+
 @await Html.PartialAsync("_news",(List<NewsModel>)Model.Where(y=>y.SourceID==(int)SearchResultType.Google_News).First().Result)
 @await Html.PartialAsync("_wikipedia",(List<WikipediaResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Wikipedia).First().Result)
-@await Html.PartialAsync("_instagram",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Instagram).First().Result)
-@await Html.PartialAsync("_twitter",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Twitter).First().Result)
+
+
+
+<div class="row">
+
+    <div class="col-6">
+        @await Html.PartialAsync("_instagram",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Instagram).First().Result)
+   
+    </div>
+
+
+    <div class="col-6">
+        @await Html.PartialAsync("_twitter",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Twitter).First().Result)
+
+    </div>
+
+</div>

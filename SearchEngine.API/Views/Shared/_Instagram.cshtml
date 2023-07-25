@@ -8,20 +8,7 @@
 <div style=" display:flex;justify-content:center;flex-direction:column;    align-items: center;background-color:#191935">
 
 
-	<div style="width:70% ;">
-		<br>
-		<div style="display :flex;background-color:#0000000a">
-			@foreach (var item in Enum.GetValues(typeof(SearchResultType)))
-			{
-				@*displying Types of results Google youtube twitter*@
-
-				<a href="@item?query=apple" class="btn btn-danger" style="padding:15px;border-radius:20px;">
-					@item
-				</a>
-			}
-
-
-		</div>
+	
 		<hr>
 
 
