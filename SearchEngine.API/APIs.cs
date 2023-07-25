@@ -17,10 +17,11 @@
 
         public static string WikiPedia_Endpoint { get; } = "https://en.wikipedia.org/wiki/Main_Page";
 
-        public static string GoogleEngine_Endpoint { get; } = "https://www.google.com/";
+        public static string  GoogleEngine_Endpoint { get; } = "https://www.google.com/";
 
+        public static string  GoogleTranslate_Endpoint { get; } = " https://translate.google.com";
 
-
+       
 
 
     }

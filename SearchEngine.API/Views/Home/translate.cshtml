@@ -6,19 +6,37 @@
 
 }
 
-
+@model SearchEngineWeb.Models.TranslateModel
 <h2>Translation</h2>
 
 <br /><br />
+<form method="post"  controller="Home" action="translate"  >
+
 
 <div class="row"> 
-     
-    <textarea class="col-6" style="background-color:aqua;height:200px;border-radius:10px;">
+  <select class="col-6 form-control" asp-for="@Model.FirstLang" >
+            @foreach (var item in Model.Languages)
+            {
+        <option value="@item.Key"> @item.Value</option>
+            }
+     </select>
+   <select class="col-6 form-control" asp-for=@Model.SecondLang >
+            @foreach (var item in Model.Languages)
+            {
+          <option value="@item.Key"> @item.Value</option>
+            }
 
+        </select>
+    <textarea  asp-for="@Model.FirstText" class="col-6" style="background-color:aqua;height:200px;border-radius:10px;">
+    
     </textarea>
 
     <div class="col-6" style="background-color:aqua;height:200px;border-radius:10px;">
-
+     @Model.SecondText
     </div>
 
 </div>
+	<button class="btn btn-primary" type="submit">Submit</button>
+
+</form>
+@Html.HiddenFor(y=>y.Languages)

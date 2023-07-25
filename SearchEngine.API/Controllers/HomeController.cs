@@ -13,15 +13,68 @@ namespace SearchEngine.API.Controllers
 {
     public class HomeController : Controller
     {
+        [HttpPost]
+        public async Task<IActionResult> Translate(TranslateModel translateModel)
+        {
+            var browserFetcher = new BrowserFetcher();
 
-        //[HttpPost]
-        //public async Task<IActionResult> Translate(TranslateModel translateModel)
-        //{
+            await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+            string[] args = { "--no-sandbox", "--lang=en-US,en" };
 
-        //}
+            var browser = await Puppeteer.LaunchAsync(
+                new LaunchOptions
+                {
+                    Headless = false,
+                    DefaultViewport = null,
+                    Args = args,
+                    Timeout = 0
+                }
+            );
+
+            var googleTask = Task.Run(async () =>
+            {
+                using (var page = await browser.NewPageAsync())
+                {
+                    //await page.SetExtraHttpHeadersAsync(headers);
+                    await page.GoToAsync(
+                        APIs.GoogleTranslate_Endpoint
+                            + "?sl="
+                            + translateModel.FirstLang
+                            + "&tl="
+                            + translateModel.SecondLang
+                            + "&text="
+                            + translateModel.FirstText
+                    );
+                    //       await page.WaitForSelectorAsync("#APjFqb");
+                    //      await page.FocusAsync("#APjFqb");
+                    //      await page.Keyboard.TypeAsync(query);
+                    //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
+                    await page.WaitForNavigationAsync();
+
+                    //   await page.SetJavaScriptEnabledAsync(true);
+                    //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
+
+
+
+                    var content = await page.GetContentAsync();
+                    HtmlDocument htmlDocument = new();
+                    htmlDocument.LoadHtml(content);
+
+                    var result = htmlDocument.DocumentNode.ChildNodes
+                        .Where(y => y.Attributes["class"].ToString() == "lRu31")
+                        .First();
+
+                    translateModel.SecondText = result.InnerText;
+
+                    await page.CloseAsync();
+                }
+            });
+
+            return View(translateModel);
+        }
 
         [HttpGet]
-            public IActionResult Translate()
+        public IActionResult Translate()
         {
             var cul = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
             var langs = new Dictionary<string, string>();
@@ -29,16 +82,17 @@ namespace SearchEngine.API.Controllers
             {
                 try
                 {
-      langs.Add(item.TwoLetterISOLanguageName, item.EnglishName.Split(" ")[0]);
+                    langs.Add(item.TwoLetterISOLanguageName, item.EnglishName.Split(" ")[0]);
                 }
-                catch (Exception e){Console.WriteLine(   e.Message);}
-          
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
-
             langs.OrderBy(y => y.Value);
             //RegionInfo regionInfo = new(cul[13].LCID);
 
-            var translateModel = new TranslateModel() {Languages=langs };
+            var translateModel = new TranslateModel() { Languages = langs };
             return View(translateModel);
         }
 
@@ -130,23 +184,18 @@ namespace SearchEngine.API.Controllers
                     {
                         try
                         {
-  googleEngineResult.genericGoogleResults.Add(
-                            new GenericGoogleResult()
-                            {
-                                Type = "Google",
-                                Header = item.ChildNodes[1].InnerText,
-                                Link = item.ChildNodes[2].InnerText,
-                                Description = ListOfDesc[counter].InnerText
-                            }
-                        );
-                        counter++;
+                            googleEngineResult.genericGoogleResults.Add(
+                                new GenericGoogleResult()
+                                {
+                                    Type = "Google",
+                                    Header = item.ChildNodes[1].InnerText,
+                                    Link = item.ChildNodes[2].InnerText,
+                                    Description = ListOfDesc[counter].InnerText
+                                }
+                            );
+                            counter++;
                         }
-                        catch (Exception)
-                        {
-
-                        
-                        }
-                      
+                        catch (Exception) { }
                     }
 
                     googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
@@ -553,7 +602,7 @@ namespace SearchEngine.API.Controllers
             List<YoutubeResultModel> youtubeList = new();
 
             /// YOUTUBE
-          var youtubeTask= Task.Run(async () =>
+            var youtubeTask = Task.Run(async () =>
             {
                 HttpClient client = new HttpClient();
                 client.BaseAddress = new Uri(APIs.Youtube_Endpoint);
@@ -651,86 +700,81 @@ namespace SearchEngine.API.Controllers
                 }
             });
 
-
-
             ////////////////////////
 
             //Images
             var imagesResult = new GoogleEngineResult();
             var imagesTask = Task.Run(async () =>
-              {
-                  using (var page = await browser.NewPageAsync())
-                  {
-                      await page.GoToAsync(
-                          APIs.GoogleEngine_Endpoint + "search?q=" + query + "&tbm=isch"
-                      );
+            {
+                using (var page = await browser.NewPageAsync())
+                {
+                    await page.GoToAsync(
+                        APIs.GoogleEngine_Endpoint + "search?q=" + query + "&tbm=isch"
+                    );
 
-                      await page.SetJavaScriptEnabledAsync(true);
-                      var content = await page.GetContentAsync();
-                      HtmlDocument htmlDocument = new();
-                      htmlDocument.LoadHtml(content);
+                    await page.SetJavaScriptEnabledAsync(true);
+                    var content = await page.GetContentAsync();
+                    HtmlDocument htmlDocument = new();
+                    htmlDocument.LoadHtml(content);
 
-                      var Results = htmlDocument.DocumentNode.ChildNodes[1].ChildNodes[1]
-                          //.Where(y => y.Id == "islrg")
-                          //.First()
-                          .Descendants("img")
-                          .ToList();
-                      imagesResult.Images = new();
+                    var Results = htmlDocument.DocumentNode.ChildNodes[1].ChildNodes[1]
+                        //.Where(y => y.Id == "islrg")
+                        //.First()
+                        .Descendants("img")
+                        .ToList();
+                    imagesResult.Images = new();
 
-                      var counter = 0;
-                      foreach (var item in Results)
-                      {
-                          try
-                          {
-                              if (item.Attributes["class"].Value.Contains("rg_i"))
-                              {
-                                  imagesResult.Images.Add(
-                                      item.Attributes["src"].Value.ToString()
-                                  );
-                              }
-                          }
-                          catch (Exception)
-                          {
-                              try
-                              {
-                                  if (item.Attributes["class"].Value.Contains("rg_i"))
-                                  {
-                                      googleEngineResult.Images.Add(
-                                          item.Attributes["data-src"].Value.ToString()
-                                      );
-                                  }
-                              }
-                              catch (Exception) { }
-                          }
+                    var counter = 0;
+                    foreach (var item in Results)
+                    {
+                        try
+                        {
+                            if (item.Attributes["class"].Value.Contains("rg_i"))
+                            {
+                                imagesResult.Images.Add(item.Attributes["src"].Value.ToString());
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            try
+                            {
+                                if (item.Attributes["class"].Value.Contains("rg_i"))
+                                {
+                                    googleEngineResult.Images.Add(
+                                        item.Attributes["data-src"].Value.ToString()
+                                    );
+                                }
+                            }
+                            catch (Exception) { }
+                        }
 
-                          counter++;
-                      }
+                        counter++;
+                    }
 
-                      imagesResult.AboutDiv = "<h3>Welcome</h3>";
+                    imagesResult.AboutDiv = "<h3>Welcome</h3>";
 
-                      //       counter++;
-                      //     }
+                    //       counter++;
+                    //     }
 
 
 
 
 
 
-                      await page.CloseAsync();
-                  }
-              });
-
+                    await page.CloseAsync();
+                }
+            });
 
             /////////////////////
 
             Task.WaitAll(
-                  googleTask,
+                googleTask,
                 wikipediaTask,
                 instagramTask,
                 twitterTask,
                 reviewsTask,
                 newsTask,
-               imagesTask,
+                imagesTask,
                 youtubeTask
             );
 
@@ -743,18 +787,19 @@ namespace SearchEngine.API.Controllers
                         Source = SearchResultType.Google_Engine.ToString(),
                         SourceID = (int)SearchResultType.Google_Engine
                     },
-                      new()
+                    new()
                     {
                         Result = imagesResult,
                         Source = SearchResultType.Images.ToString(),
                         SourceID = (int)SearchResultType.Images
-                    },new()
+                    },
+                    new()
                     {
                         Result = newsList,
                         Source = SearchResultType.Google_News.ToString(),
                         SourceID = (int)SearchResultType.Google_News
                     },
-                      new()
+                    new()
                     {
                         Result = googleReviews,
                         Source = SearchResultType.Google_Reviews.ToString(),
@@ -765,17 +810,20 @@ namespace SearchEngine.API.Controllers
                         Result = youtubeList,
                         Source = SearchResultType.Youtube.ToString(),
                         SourceID = (int)SearchResultType.Youtube
-                    },new()
+                    },
+                    new()
                     {
                         Result = wikipediaResults,
                         Source = SearchResultType.Wikipedia.ToString(),
                         SourceID = (int)SearchResultType.Wikipedia
-                    },new()
+                    },
+                    new()
                     {
                         Result = twitterResultsList,
                         Source = SearchResultType.Twitter.ToString(),
                         SourceID = (int)SearchResultType.Twitter
-                    },new()
+                    },
+                    new()
                     {
                         Result = InstgramResultsList,
                         Source = SearchResultType.Instagram.ToString(),
@@ -783,7 +831,7 @@ namespace SearchEngine.API.Controllers
                     }
                 };
 
-       await   browser.CloseAsync();
+            await browser.CloseAsync();
             return View(searchResultList);
         }
 
