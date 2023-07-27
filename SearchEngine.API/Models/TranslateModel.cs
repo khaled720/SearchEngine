@@ -3,10 +3,10 @@
     public class TranslateModel
     {
 
-        public string FirstLang { get; set; }
-        public string FirstText { get; set; }
-        public string SecondLang { get; set; }
-        public string SecondText { get; set; }
+        public string FirstLang  { get; set; }  =  string.Empty;
+        public string FirstText  { get; set; }  =  string.Empty;
+        public string SecondLang { get; set; } = string.Empty;
+        public string SecondText { get; set; } = string.Empty;
 
 
         public Dictionary<string, string> Languages { get; set; }
