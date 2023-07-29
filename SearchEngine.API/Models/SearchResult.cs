@@ -23,7 +23,8 @@
     Twitter,
      Google_Reviews,
      Wikipedia,
-     Images
+     Images,
+     Everything
  //    Instagram_Twitter
 		
    

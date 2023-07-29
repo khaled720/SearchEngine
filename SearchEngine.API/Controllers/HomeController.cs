@@ -12,7 +12,7 @@ using static System.Net.WebRequestMethods;
 namespace SearchEngine.API.Controllers
 {
     public class HomeController : Controller
-    {
+    {/*
         [HttpPost]
         public async Task<IActionResult> Translate(TranslateModel translateModel)
         {
@@ -31,26 +31,26 @@ namespace SearchEngine.API.Controllers
                 }
             );
 
-            var googleTask = Task.Run(async () =>
+            await Task.Run(async () =>
             {
                 using (var page = await browser.NewPageAsync())
                 {
                     //await page.SetExtraHttpHeadersAsync(headers);
                     await page.GoToAsync(
                         APIs.GoogleTranslate_Endpoint
-                            + "?sl="
+                            + "?sl=en"
                             + translateModel.FirstLang
-                            + "&tl="
+                            + "&tl=ar"
                             + translateModel.SecondLang
-                            + "&text="
+                            + "&text=hello it is me"
                             + translateModel.FirstText
                     );
                     //       await page.WaitForSelectorAsync("#APjFqb");
                     //      await page.FocusAsync("#APjFqb");
                     //      await page.Keyboard.TypeAsync(query);
                     //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
-                    await page.WaitForNavigationAsync();
-
+                    //    await page.WaitForNavigationAsync();
+                    await Task.Delay(2000);
                     //   await page.SetJavaScriptEnabledAsync(true);
                     //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
 
@@ -60,19 +60,19 @@ namespace SearchEngine.API.Controllers
                     HtmlDocument htmlDocument = new();
                     htmlDocument.LoadHtml(content);
 
-                    var result = htmlDocument.DocumentNode.ChildNodes
-                        .Where(y => y.Attributes["class"].ToString() == "lRu31")
-                        .First();
+                    var result = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"yDmH0d\"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div/div[2]/div[3]/c-wiz[2]/div/div[9]/div/div[1]");
+
 
                     translateModel.SecondText = result.InnerText;
 
                     await page.CloseAsync();
                 }
             });
+            await browser.CloseAsync();
 
             return View(translateModel);
         }
-
+        */
         [HttpGet]
         public IActionResult Translate()
         {
@@ -82,7 +82,7 @@ namespace SearchEngine.API.Controllers
             {
                 try
                 {
-                    langs.Add(item.TwoLetterISOLanguageName, item.EnglishName.Split(" ")[0]);
+                    langs.Add(item.TwoLetterISOLanguageName+"-"+item.TextInfo.IsRightToLeft, item.EnglishName.Split(" ")[0]);
                 }
                 catch (Exception e)
                 {
@@ -1085,6 +1085,8 @@ namespace SearchEngine.API.Controllers
 
                 case "Images":
                     return RedirectToAction("Images", new { query = query });
+                case "Everything":
+                    return RedirectToAction("All", new { query = query });
 
                 default:
 

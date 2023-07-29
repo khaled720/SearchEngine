@@ -7,35 +7,56 @@
 }
 
 @model SearchEngineWeb.Models.TranslateModel
-<h2>Translation</h2>
+
+<link href="~/css/translate.css" rel="stylesheet" />
+
+
+<h2 style="color:white">Translation</h2>
 
 <br /><br />
-<form method="post"  controller="Home" action="Translate"  >
+
 
 
 <div class="row"> 
-  <select class="col-6 form-control" name="f" value="" asp-for="@Model.FirstLang" >
-            @foreach (var item in Model.Languages)
-            {
-        <option value="@item.Key"> @item.Value</option>
-            }
-     </select>
-   <select class="col-6 form-control" name="s" asp-for=@Model.SecondLang >
-            @foreach (var item in Model.Languages)
-            {
-          <option value="@item.Key"> @item.Value</option>
-            }
+    <div class="col-6">
+            <select id="sl" class="form-control">
+                @foreach (var item in Model.Languages)
+                {
+                    <option value="@item.Key"> @item.Value</option>
+                }
+            </select>
 
-        </select>
-    
-       
+    </div>
 
-        @Html.TextAreaFor(y=>y.FirstText ,new {@class="col-6" ,@style="background-color:aqua;height:200px;border-radius:10px;"})
-    <div class="col-6" style="background-color:aqua;height:200px;border-radius:10px;">
-     @Model.SecondText
+    <div class="col-6">
+
+            <select id="tl" class="form-control">
+                @foreach (var item in Model.Languages)
+                {
+                    <option value="@item.Key"> @item.Value</option>
+                }
+
+            </select>
+    </div>
+
+
+
+
+    <textarea id="stext" required class="col-6 translate-font" style="background-color:aqua;height:200px;border-radius:10px;">
+
+        </textarea>
+
+    <div class="col-6 translate-font" id="ltext">
+     
+
+        <div id="loading"></div>
     </div>
 
 </div>
-	<button class="btn btn-primary" type="submit">Submit</button>
+	<button class="btn btn-primary" id="subBtn">Submit</button>
 @Html.HiddenFor(y=>y.Languages)
-</form>
+
+
+
+
+<script src="~/js/translate.js"></script>

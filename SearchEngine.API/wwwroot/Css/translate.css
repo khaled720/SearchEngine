@@ -1,0 +1,52 @@
+﻿body {
+}
+
+
+#loading {
+
+    animation:fade 2s infinite linear;
+
+}
+@keyframes fade {
+    33% {
+    opacity:0;
+    }
+
+    66% {
+      opacity:1;
+    }
+
+    99% {
+    
+    opacity:0
+    }
+}
+
+.translate-font {
+    font-size:20px !important;
+
+}
+
+
+#ltext {
+    background-color: aqua;
+    height: 200px;
+    border-radius: 10px;
+    padding:20px;
+
+}
+
+.shimmer-div {
+    
+    animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+    50% {
+        transform: translateX(percentage);
+    }
+
+    100% {
+        transform: translateX(percentage);
+    }
+}
