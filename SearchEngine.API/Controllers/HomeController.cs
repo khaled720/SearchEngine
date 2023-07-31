@@ -217,12 +217,13 @@ namespace SearchEngine.API.Controllers
                     var content = await page.GetContentAsync();
                     HtmlDocument htmlDocument = new();
                     htmlDocument.LoadHtml(content);
+                    try
+                    {
+                        var filters = htmlDocument.DocumentNode.SelectSingleNode(
+                       "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
+                   );
 
-                    var filters = htmlDocument.DocumentNode.SelectSingleNode(
-                        "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
-                    );
-
-                    var filtersNames = new List<string>();
+                        var filtersNames = new List<string>();
 
                     var Results = htmlDocument.DocumentNode.ChildNodes
                         .Descendants("a")
@@ -268,26 +269,33 @@ namespace SearchEngine.API.Controllers
                         )
                         .ToList();
 
-                    //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
-                    googleEngineResult.genericGoogleResults = new();
-                    var counter = 0;
-                    foreach (var item in Results)
-                    {
-                        try
+                        //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
+                        googleEngineResult.genericGoogleResults = new();
+                        var counter = 0;
+                        foreach (var item in Results)
                         {
-                            googleEngineResult.genericGoogleResults.Add(
-                                new GenericGoogleResult()
-                                {
-                                    Type = "Google",
-                                    Header = item.ChildNodes[1].InnerText,
-                                    Link = item.ChildNodes[2].InnerText,
-                                    Description = ListOfDesc[counter].InnerText
-                                }
-                            );
-                            counter++;
+                            try
+                            {
+                                googleEngineResult.genericGoogleResults.Add(
+                                    new GenericGoogleResult()
+                                    {
+                                        Type = "Google",
+                                        Header = item.ChildNodes[1].InnerText,
+                                        Link = item.ChildNodes[2].InnerText,
+                                        Description = ListOfDesc[counter].InnerText
+                                    }
+                                );
+                                counter++;
+                            }
+                            catch (Exception) { }
                         }
-                        catch (Exception) { }
                     }
+                    catch (Exception)
+                    {
+
+                        
+                    }
+                   
 
                     googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
 
@@ -509,6 +517,7 @@ InstgramResultsList.Add(
                     await page.GoToAsync(APIs.PlacesReviews_Endpoint + query,timeout:0);
                     await Task.Delay(2000);
                     await page.ClickAsync("#searchbox-searchbutton");
+                   
                     await Task.Delay(2000);
                     await page.EvaluateExpressionAsync(
                         "document.getElementsByClassName('TFQHme')[0].parentNode.scrollBy(0,1000)"
