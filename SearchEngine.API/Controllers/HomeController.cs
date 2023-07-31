@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Linq.Expressions;
 using System.Reflection.PortableExecutable;
 using System.Xml;
 using HtmlAgilityPack;
@@ -12,67 +13,8 @@ using static System.Net.WebRequestMethods;
 namespace SearchEngine.API.Controllers
 {
     public class HomeController : Controller
-    {/*
-        [HttpPost]
-        public async Task<IActionResult> Translate(TranslateModel translateModel)
-        {
-            var browserFetcher = new BrowserFetcher();
-
-            await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
-            string[] args = { "--no-sandbox", "--lang=en-US,en" };
-
-            var browser = await Puppeteer.LaunchAsync(
-                new LaunchOptions
-                {
-                    Headless = true,
-                    DefaultViewport = null,
-                    Args = args,
-                    Timeout = 0
-                }
-            );
-
-            await Task.Run(async () =>
-            {
-                using (var page = await browser.NewPageAsync())
-                {
-                    //await page.SetExtraHttpHeadersAsync(headers);
-                    await page.GoToAsync(
-                        APIs.GoogleTranslate_Endpoint
-                            + "?sl=en"
-                            + translateModel.FirstLang
-                            + "&tl=ar"
-                            + translateModel.SecondLang
-                            + "&text=hello it is me"
-                            + translateModel.FirstText
-                    );
-                    //       await page.WaitForSelectorAsync("#APjFqb");
-                    //      await page.FocusAsync("#APjFqb");
-                    //      await page.Keyboard.TypeAsync(query);
-                    //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
-                    //    await page.WaitForNavigationAsync();
-                    await Task.Delay(2000);
-                    //   await page.SetJavaScriptEnabledAsync(true);
-                    //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
-
-
-
-                    var content = await page.GetContentAsync();
-                    HtmlDocument htmlDocument = new();
-                    htmlDocument.LoadHtml(content);
-
-                    var result = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"yDmH0d\"]/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div/div[2]/div[3]/c-wiz[2]/div/div[9]/div/div[1]");
-
-
-                    translateModel.SecondText = result.InnerText;
-
-                    await page.CloseAsync();
-                }
-            });
-            await browser.CloseAsync();
-
-            return View(translateModel);
-        }
-        */
+    {
+        
         [HttpGet]
         public IActionResult Translate()
         {
@@ -101,12 +43,12 @@ namespace SearchEngine.API.Controllers
             var browserFetcher = new BrowserFetcher();
 
             await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
-            string[] args = { "--no-sandbox", "--lang=en-US,en" };
+            string[] args = { "--no-sandbox" };
 
             var browser = await Puppeteer.LaunchAsync(
                 new LaunchOptions
                 {
-                    Headless = true,
+                    Headless = false ,
                     DefaultViewport = null,
                     Args = args,
                     Timeout = 0
@@ -115,200 +57,125 @@ namespace SearchEngine.API.Controllers
 
 
 
-            var wikipediaResults = new List<WikipediaResult>();
-
-            var wikipediaTask = Task.Run(async () =>
-            {
-                using (var page = await browser.NewPageAsync())
-                {
-                    // await page.SetExtraHttpHeadersAsync(headers);
-                    await page.GoToAsync(APIs.WikiPedia_Endpoint);
-                    await page.SetViewportAsync(
-                        new ViewPortOptions() { IsLandscape = true, IsMobile = false }
-                    );
-                    await page.TypeAsync(".cdx-text-input__input", query);
-                    await Task.Delay(10000);
-                    ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
-
-
-                    //await page.EvaluateExpressionAsync("window.scrollBy(0, window.innerHeight)")
-                    //   await page.ClickAsync("#searchbox-searchbutton");
-                    // await Task.Delay(10000);
-                    //        await page.WaitForXPathAsync("/html/body/c-wiz[2]/div/div/c-wiz/c-wiz/c-wiz/section/div/div/div");
-                    var content = await page.GetContentAsync();
-                    HtmlDocument htmlDocument = new();
-                    htmlDocument.LoadHtml(content);
-
-                    var resultsListDiv = htmlDocument.DocumentNode
-                        .Descendants()
-                        .Where(y => y.Id == "cdx-typeahead-search-menu-0")
-                        .FirstOrDefault();
-                    if (resultsListDiv != null)
-                    {
-                        foreach (var item in resultsListDiv.ChildNodes.ToList())
-                        {
-                            if (!String.IsNullOrEmpty(item.InnerText) && item.Name == "li")
-                            {
-                                try
-                                {
-                                    var ImageLink = "";
-                                    try
-                                    {
-                                        ImageLink = item.ChildNodes[0].ChildNodes[0].ChildNodes[
-                                            1
-                                        ].Attributes["style"].DeEntitizeValue
-                                            .Replace("background-image", "")
-                                            .Replace("url(\"", "")
-                                            .Replace("\")", "")
-                                            .Replace(": //", "")
-                                            .Replace(";", "");
-                                    }
-                                    catch (Exception) { }
-                                    var Desc = item.ChildNodes[0].ChildNodes[1].ChildNodes[
-                                        3
-                                    ].InnerText;
-                                    var Title = item.ChildNodes[0].ChildNodes[1].ChildNodes[
-                                        0
-                                    ].InnerText;
-
-                                    wikipediaResults.Add(
-                                        new WikipediaResult()
-                                        {
-                                            Title = Title,
-                                            Description = Desc,
-                                            ThumbImg = ImageLink,
-                                            ArticleLink =
-                                                "https://en.wikipedia.org/wiki/"
-                                                + Title.Trim().Replace(" ", "_")
-                                        }
-                                    );
-                                }
-                                catch (Exception e)
-                                {
-                                    continue;
-                                }
-                            }
-                        }
-                    }
-                    await page.CloseAsync();
-                }
-            });
-
-            //////////////////////////////////////
             GoogleEngineResult googleEngineResult = new GoogleEngineResult();
             googleEngineResult.Query = query;
             var googleTask = Task.Run(async () =>
             {
                 using (var page = await browser.NewPageAsync())
                 {
-                    //await page.SetExtraHttpHeadersAsync(headers);
-                    await page.GoToAsync(APIs.GoogleEngine_Endpoint + "search?q=" + query,timeout:0);
-                    //       await page.WaitForSelectorAsync("#APjFqb");
-                    //      await page.FocusAsync("#APjFqb");
-                    //      await page.Keyboard.TypeAsync(query);
-                    //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
-                    //     await page.WaitForNavigationAsync();
-
-                    await page.SetJavaScriptEnabledAsync(true);
-                    //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
-
-
-
-                    var content = await page.GetContentAsync();
-                    HtmlDocument htmlDocument = new();
-                    htmlDocument.LoadHtml(content);
                     try
                     {
-                        var filters = htmlDocument.DocumentNode.SelectSingleNode(
-                       "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
-                   );
+                        //await page.SetExtraHttpHeadersAsync(headers);
+                        await page.GoToAsync(APIs.GoogleEngine_Endpoint + "search?q=" + query, timeout: 0);
+                        //       await page.WaitForSelectorAsync("#APjFqb");
+                        //      await page.FocusAsync("#APjFqb");
+                        //      await page.Keyboard.TypeAsync(query);
+                        //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
+                        //     await page.WaitForNavigationAsync();
 
-                        var filtersNames = new List<string>();
+                        await page.SetJavaScriptEnabledAsync(true);
+                        //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
 
-                    var Results = htmlDocument.DocumentNode.ChildNodes
-                        .Descendants("a")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
-                        .ToList();
-                    try
-                    {
-  foreach (var result in filters.ChildNodes)
-                    {
+
+
+                        var content = await page.GetContentAsync();
+                        HtmlDocument htmlDocument = new();
+                        htmlDocument.LoadHtml(content);
                         try
                         {
-                            if (result.Name == "a")
-                            {
-                                var link = result.Attributes["href"].Value;
-                                googleEngineResult.Filters.Add(result.InnerText, link);
-                            }
-                            else if (result.Name == "div")
-                            {
-                                var link = result.Descendants("a").ToList()[0].Attributes[
-                                    "href"
-                                ].Value;
-                                googleEngineResult.Filters.Add(result.InnerText, link);
-                            }
-                        }
-                        catch (Exception) { }
-                    }
+                            var filters = htmlDocument.DocumentNode.SelectSingleNode(
+                           "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
+                       );
 
-                    }
-                    catch (Exception)
-                    {
+                            var filtersNames = new List<string>();
 
-                     
-                    }
-                  
-                    var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
-                        .Descendants("span")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(
-                            y =>
-                                y.ParentNode.Attributes["class"].Value
-                                == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
-                        )
-                        .ToList();
-
-                        //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
-                        googleEngineResult.genericGoogleResults = new();
-                        var counter = 0;
-                        foreach (var item in Results)
-                        {
+                            var Results = htmlDocument.DocumentNode.ChildNodes
+                                .Descendants("a")
+                                .Where(r => r.ParentNode.Attributes["class"] != null)
+                                .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                                .ToList();
                             try
                             {
-                                googleEngineResult.genericGoogleResults.Add(
-                                    new GenericGoogleResult()
+                                foreach (var result in filters.ChildNodes)
+                                {
+                                    try
                                     {
-                                        Type = "Google",
-                                        Header = item.ChildNodes[1].InnerText,
-                                        Link = item.ChildNodes[2].InnerText,
-                                        Description = ListOfDesc[counter].InnerText
+                                        if (result.Name == "a")
+                                        {
+                                            var link = result.Attributes["href"].Value;
+                                            googleEngineResult.Filters.Add(result.InnerText, link);
+                                        }
+                                        else if (result.Name == "div")
+                                        {
+                                            var link = result.Descendants("a").ToList()[0].Attributes[
+                                                "href"
+                                            ].Value;
+                                            googleEngineResult.Filters.Add(result.InnerText, link);
+                                        }
                                     }
-                                );
-                                counter++;
+                                    catch (Exception) { }
+                                }
+
                             }
-                            catch (Exception) { }
+                            catch (Exception)
+                            {
+
+
+                            }
+
+                            var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
+                                .Descendants("span")
+                                .Where(r => r.ParentNode.Attributes["class"] != null)
+                                .Where(
+                                    y =>
+                                        y.ParentNode.Attributes["class"].Value
+                                        == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
+                                )
+                                .ToList();
+
+                            //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
+                            googleEngineResult.genericGoogleResults = new();
+                            var counter = 0;
+                            foreach (var item in Results)
+                            {
+                                try
+                                {
+                                    googleEngineResult.genericGoogleResults.Add(
+                                        new GenericGoogleResult()
+                                        {
+                                            Type = "Google",
+                                            Header = item.ChildNodes[1].InnerText,
+                                            Link = item.ChildNodes[2].InnerText,
+                                            Description = ListOfDesc[counter].InnerText
+                                        }
+                                    );
+                                    counter++;
+                                }
+                                catch (Exception) { }
+                            }
                         }
+                        catch (Exception)
+                        {
+
+
+                        }
+
+
+                        googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
+
+                        //       counter++;
+                        //     }
+
+
+
+
+
                     }
-                    catch (Exception)
-                    {
-
-                        
+                    catch (Exception) { }
+                        await page.CloseAsync();
                     }
-                   
-
-                    googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
-
-                    //       counter++;
-                    //     }
-
-
-
-
-
-
-                    await page.CloseAsync();
-                }
+                    
+        
             });
 
             /////////////////////////////////////////////////////////////////////////
@@ -319,10 +186,12 @@ namespace SearchEngine.API.Controllers
 
             var instagramTask = Task.Run(async () =>
             {
-                using (var page = await browser.NewPageAsync())
+                try
+                {
+        using (var page = await browser.NewPageAsync())
                 {
                     //    await page.SetExtraHttpHeadersAsync(headers);
-                    await page.GoToAsync(APIs.GoogleEngine_Endpoint);
+                    await page.GoToAsync(APIs.GoogleEngine_Endpoint,timeout:0);
                     await page.WaitForSelectorAsync("#APjFqb");
                     await page.FocusAsync("#APjFqb");
                     await page.Keyboard.TypeAsync("site:Instagram.com " + query);
@@ -381,13 +250,22 @@ InstgramResultsList.Add(
 
                     await page.CloseAsync();
                 }
-            });
+         
+                }
+                catch (Exception)
+                {
+
+                   
+                }
+           });
 
             ////////////////////////////////////////
             List<GenericGoogleResult> twitterResultsList = new();
             var twitterTask = Task.Run(async () =>
             {
-                using (var page = await browser.NewPageAsync())
+                try
+                {
+ using (var page = await browser.NewPageAsync())
                 {
                     await page.GoToAsync(APIs.GoogleEngine_Endpoint);
                     await page.WaitForSelectorAsync("#APjFqb");
@@ -440,6 +318,13 @@ InstgramResultsList.Add(
                         counter++;
                     }
                 }
+                }
+                catch (Exception)
+                {
+
+                   
+                }
+               
             });
             //////////////////////////////////////////////
 
@@ -448,7 +333,9 @@ InstgramResultsList.Add(
             //GOOGLE PLAY REVIEWS TASK
             var reviewsTask = Task.Run(async () =>
             {
-                using (var page = await browser.NewPageAsync())
+                try { 
+                      
+                    using (var page = await browser.NewPageAsync())
                 {
                     //     await page.SetExtraHttpHeadersAsync(headers);
                     await page.GoToAsync(APIs.AppsReviews_Endpoint + "search?q=" + query);
@@ -514,10 +401,10 @@ InstgramResultsList.Add(
 
                     ////////////////////////////////////////////////////////////////////
                     /////places
-                    await page.GoToAsync(APIs.PlacesReviews_Endpoint + query,timeout:0);
+                    await page.GoToAsync(APIs.PlacesReviews_Endpoint + query, timeout: 0);
                     await Task.Delay(2000);
                     await page.ClickAsync("#searchbox-searchbutton");
-                   
+
                     await Task.Delay(2000);
                     await page.EvaluateExpressionAsync(
                         "document.getElementsByClassName('TFQHme')[0].parentNode.scrollBy(0,1000)"
@@ -566,16 +453,20 @@ InstgramResultsList.Add(
                         await page.CloseAsync();
                     }
                 }
+                }
+                catch (Exception) { }
             });
-            /////////////////////////////////////////
+           
 
 
+            //////////////////////////////////////
             var newsList = new List<NewsModel>();
-
+           
             /// GOOGLE NEWS
             var newsTask = Task.Run(async () =>
+            { try
             {
-                HttpClient googleNewsClient = new HttpClient();
+  HttpClient googleNewsClient = new HttpClient();
 
                 googleNewsClient.BaseAddress = new Uri(APIs.GoogleNews_Endpoint);
                 var requestUri1 = "?q=" + query;
@@ -636,6 +527,13 @@ InstgramResultsList.Add(
                     if (counter == 30)
                         break;
                 }
+            }
+            catch (Exception)
+            {
+
+               
+            }
+              
             });
             ////////////////////////////////////////////
 
@@ -646,100 +544,109 @@ InstgramResultsList.Add(
             /// YOUTUBE
             var youtubeTask = Task.Run(async () =>
             {
-                HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri(APIs.Youtube_Endpoint);
-                client.DefaultRequestHeaders.Clear();
-                var requestUri =
-                    "search?q="
-                    + query
-                    + "&max_results=10&part=snippet&key="
-                    + Keys.Youtube_API_KEY;
-                var res = client.GetAsync(requestUri).GetAwaiter().GetResult();
-                var result = res.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                var re = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(result);
-                var finalresult = re["items"];
-
-                foreach (var item in finalresult)
+                try
                 {
-                    var youtubeResult = new YoutubeResultModel();
+                    HttpClient client = new HttpClient();
+                    client.BaseAddress = new Uri(APIs.Youtube_Endpoint);
+                    client.DefaultRequestHeaders.Clear();
+                    var requestUri =
+                        "search?q="
+                        + query
+                        + "&max_results=10&part=snippet&key="
+                        + Keys.Youtube_API_KEY;
+                    var res = client.GetAsync(requestUri).GetAwaiter().GetResult();
+                    var result = res.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    var re = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(result);
+                    var finalresult = re["items"];
 
-                    string kind = item["id"]["kind"];
-
-                    switch (kind.ToLower().Replace("youtube#", ""))
+                    foreach (var item in finalresult)
                     {
-                        case "channel":
-                            youtubeResult.ChannelId = item["id"]["channelId"];
-                            youtubeResult.ChannelTitle = item["snippet"]["title"];
+                        var youtubeResult = new YoutubeResultModel();
 
-                            youtubeResult.PublishedAt = item["snippet"]["publishedAt"];
-                            youtubeResult.ChannelDescription = item["snippet"]["description"];
+                        string kind = item["id"]["kind"];
 
-                            youtubeResult.ResultType = YoutubeResultTypes.Channel.ToString();
-                            break;
+                        switch (kind.ToLower().Replace("youtube#", ""))
+                        {
+                            case "channel":
+                                youtubeResult.ChannelId = item["id"]["channelId"];
+                                youtubeResult.ChannelTitle = item["snippet"]["title"];
 
-                        case "video":
-                            youtubeResult.VideoId = item["id"]["videoId"];
-                            youtubeResult.VideoThumbImage =
-                                "https://img.youtube.com/vi/"
-                                + youtubeResult.VideoId
-                                + "/hqdefault.jpg";
-                            youtubeResult.ResultType = YoutubeResultTypes.Video.ToString();
+                                youtubeResult.PublishedAt = item["snippet"]["publishedAt"];
+                                youtubeResult.ChannelDescription = item["snippet"]["description"];
 
-                            var videoRequestUri =
-                                APIs.Youtube_Endpoint
-                                + "videos?key="
-                                + Keys.Youtube_API_KEY
-                                + "&part=snippet,statistics&id="
-                                + item["id"]["videoId"];
-                            var responseObj = client
-                                .GetAsync(videoRequestUri)
-                                .GetAwaiter()
-                                .GetResult();
-                            var reslt = responseObj.Content
-                                .ReadAsStringAsync()
-                                .GetAwaiter()
-                                .GetResult();
-                            var responseJson = JsonConvert.DeserializeObject<
-                                Dictionary<string, dynamic>
-                            >(reslt);
+                                youtubeResult.ResultType = YoutubeResultTypes.Channel.ToString();
+                                break;
 
-                            youtubeResult.PublishedAt = item["snippet"]["publishedAt"];
-                            youtubeResult.VideoDescription = item["snippet"]["description"];
-                            youtubeResult.VideoTitle = item["snippet"]["title"];
-                            youtubeResult.ChannelId = item["snippet"]["channelId"];
-                            youtubeResult.ChannelTitle = responseJson["items"][0]["snippet"][
-                                "channelTitle"
-                            ];
+                            case "video":
+                                youtubeResult.VideoId = item["id"]["videoId"];
+                                youtubeResult.VideoThumbImage =
+                                    "https://img.youtube.com/vi/"
+                                    + youtubeResult.VideoId
+                                    + "/hqdefault.jpg";
+                                youtubeResult.ResultType = YoutubeResultTypes.Video.ToString();
 
-                            youtubeResult.VideoViews = responseJson["items"][0]["statistics"][
-                                "viewCount"
-                            ];
-                            youtubeResult.VideoLikes = responseJson["items"][0]["statistics"][
-                                "likeCount"
-                            ];
-                            youtubeResult.VideoComments = responseJson["items"][0]["statistics"][
-                                "commentCount"
-                            ];
+                                var videoRequestUri =
+                                    APIs.Youtube_Endpoint
+                                    + "videos?key="
+                                    + Keys.Youtube_API_KEY
+                                    + "&part=snippet,statistics&id="
+                                    + item["id"]["videoId"];
+                                var responseObj = client
+                                    .GetAsync(videoRequestUri)
+                                    .GetAwaiter()
+                                    .GetResult();
+                                var reslt = responseObj.Content
+                                    .ReadAsStringAsync()
+                                    .GetAwaiter()
+                                    .GetResult();
+                                var responseJson = JsonConvert.DeserializeObject<
+                                    Dictionary<string, dynamic>
+                                >(reslt);
 
-                            break;
+                                youtubeResult.PublishedAt = item["snippet"]["publishedAt"];
+                                youtubeResult.VideoDescription = item["snippet"]["description"];
+                                youtubeResult.VideoTitle = item["snippet"]["title"];
+                                youtubeResult.ChannelId = item["snippet"]["channelId"];
+                                youtubeResult.ChannelTitle = responseJson["items"][0]["snippet"][
+                                    "channelTitle"
+                                ];
 
-                        case "playlist":
-                            youtubeResult.PlaylistId = item["id"]["playlistId"];
+                                youtubeResult.VideoViews = responseJson["items"][0]["statistics"][
+                                    "viewCount"
+                                ];
+                                youtubeResult.VideoLikes = responseJson["items"][0]["statistics"][
+                                    "likeCount"
+                                ];
+                                youtubeResult.VideoComments = responseJson["items"][0]["statistics"][
+                                    "commentCount"
+                                ];
 
-                            youtubeResult.PlaylistTitle = item["snippet"]["title"];
-                            youtubeResult.ChannelId = item["snippet"]["channelId"];
+                                break;
 
-                            youtubeResult.PublishedAt = item["snippet"]["publishedAt"];
-                            youtubeResult.PlaylistDesceription = item["snippet"]["description"];
-                            youtubeResult.ResultType = YoutubeResultTypes.Playlist.ToString();
-                            break;
+                            case "playlist":
+                                youtubeResult.PlaylistId = item["id"]["playlistId"];
 
-                        default:
-                            break;
+                                youtubeResult.PlaylistTitle = item["snippet"]["title"];
+                                youtubeResult.ChannelId = item["snippet"]["channelId"];
+
+                                youtubeResult.PublishedAt = item["snippet"]["publishedAt"];
+                                youtubeResult.PlaylistDesceription = item["snippet"]["description"];
+                                youtubeResult.ResultType = YoutubeResultTypes.Playlist.ToString();
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        youtubeList.Add(youtubeResult);
                     }
-
-                    youtubeList.Add(youtubeResult);
                 }
+                catch (Exception)
+                {
+
+                    
+                }
+             
             });
 
             ////////////////////////
@@ -750,55 +657,64 @@ InstgramResultsList.Add(
             {
                 using (var page = await browser.NewPageAsync())
                 {
-                    await page.GoToAsync(
-                        APIs.GoogleEngine_Endpoint + "search?q=" + query + "&tbm=isch"
-                    );
-
-                    await page.SetJavaScriptEnabledAsync(true);
-                    var content = await page.GetContentAsync();
-                    HtmlDocument htmlDocument = new();
-                    htmlDocument.LoadHtml(content);
-
-                    var Results = htmlDocument.DocumentNode.ChildNodes[1].ChildNodes[1]
-                        //.Where(y => y.Id == "islrg")
-                        //.First()
-                        .Descendants("img")
-                        .ToList();
-                    imagesResult.Images = new();
-
-                    var counter = 0;
-                    foreach (var item in Results)
+                    try
                     {
-                        try
-                        {
-                            if (item.Attributes["class"].Value.Contains("rg_i"))
-                            {
-                                imagesResult.Images.Add(item.Attributes["src"].Value.ToString());
-                            }
-                        }
-                        catch (Exception)
+                        await page.GoToAsync(
+                                           APIs.GoogleEngine_Endpoint + "search?q=" + query + "&tbm=isch"
+                                       );
+
+                        await page.SetJavaScriptEnabledAsync(true);
+                        var content = await page.GetContentAsync();
+                        HtmlDocument htmlDocument = new();
+                        htmlDocument.LoadHtml(content);
+
+                        var Results = htmlDocument.DocumentNode.ChildNodes[1].ChildNodes[1]
+                            //.Where(y => y.Id == "islrg")
+                            //.First()
+                            .Descendants("img")
+                            .ToList();
+                        imagesResult.Images = new();
+
+                        var counter = 0;
+                        foreach (var item in Results)
                         {
                             try
                             {
                                 if (item.Attributes["class"].Value.Contains("rg_i"))
                                 {
-                                    googleEngineResult.Images.Add(
-                                        item.Attributes["data-src"].Value.ToString()
-                                    );
+                                    imagesResult.Images.Add(item.Attributes["src"].Value.ToString());
                                 }
                             }
-                            catch (Exception) { }
+                            catch (Exception)
+                            {
+                                try
+                                {
+                                    if (item.Attributes["class"].Value.Contains("rg_i"))
+                                    {
+                                        googleEngineResult.Images.Add(
+                                            item.Attributes["data-src"].Value.ToString()
+                                        );
+                                    }
+                                }
+                                catch (Exception) { }
+                            }
+
+                            counter++;
                         }
 
-                        counter++;
+                        imagesResult.AboutDiv = "<h3>Welcome</h3>";
+
+                        //       counter++;
+                        //     }
+
+
                     }
+                    catch (Exception)
+                    {
 
-                    imagesResult.AboutDiv = "<h3>Welcome</h3>";
-
-                    //       counter++;
-                    //     }
-
-
+                    
+                    }
+               
 
 
 
@@ -808,6 +724,96 @@ InstgramResultsList.Add(
             });
 
             /////////////////////
+            ///
+
+
+            /////////////////////////////////////////
+
+
+            var wikipediaResults = new List<WikipediaResult>();
+
+            var wikipediaTask = Task.Run(async () =>
+            {
+                try
+                {
+                    using (var page = await browser.NewPageAsync())
+                    {
+                        
+                        // await page.SetExtraHttpHeadersAsync(headers);
+                        
+                        await page.GoToAsync(APIs.WikiPedia_Endpoint, timeout: 0);
+                        // await page.EvaluateExpressionAsync("");
+                  //      await page.WaitForNavigationAsync();
+                        await page.TypeAsync(".cdx-text-input__input", query);
+                        await Task.Delay(5000);
+                        ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
+
+
+                        //await page.EvaluateExpressionAsync("window.scrollBy(0, window.innerHeight)")
+                        //   await page.ClickAsync("#searchbox-searchbutton");
+                        // await Task.Delay(10000);
+                        //        await page.WaitForXPathAsync("/html/body/c-wiz[2]/div/div/c-wiz/c-wiz/c-wiz/section/div/div/div");
+                        var content = await page.GetContentAsync();
+                        HtmlDocument htmlDocument = new();
+                        htmlDocument.LoadHtml(content);
+
+                        var resultsListDiv = htmlDocument.DocumentNode
+                            .Descendants()
+                            .Where(y => y.Id == "cdx-typeahead-search-menu-0")
+                            .FirstOrDefault();
+                        if (resultsListDiv != null)
+                        {
+                            foreach (var item in resultsListDiv.ChildNodes.ToList())
+                            {
+                                if (!String.IsNullOrEmpty(item.InnerText) && item.Name == "li")
+                                {
+                                    try
+                                    {
+                                        var ImageLink = "";
+                                        try
+                                        {
+                                            ImageLink = item.ChildNodes[0].ChildNodes[0].ChildNodes[
+                                                1
+                                            ].Attributes["style"].DeEntitizeValue
+                                                .Replace("background-image", "")
+                                                .Replace("url(\"", "")
+                                                .Replace("\")", "")
+                                                .Replace(": //", "")
+                                                .Replace(";", "");
+                                        }
+                                        catch (Exception) { }
+                                        var Desc = item.ChildNodes[0].ChildNodes[1].ChildNodes[
+                                            3
+                                        ].InnerText;
+                                        var Title = item.ChildNodes[0].ChildNodes[1].ChildNodes[
+                                            0
+                                        ].InnerText;
+
+                                        wikipediaResults.Add(
+                                            new WikipediaResult()
+                                            {
+                                                Title = Title,
+                                                Description = Desc,
+                                                ThumbImg = ImageLink,
+                                                ArticleLink =
+                                                    "https://en.wikipedia.org/wiki/"
+                                                    + Title.Trim().Replace(" ", "_")
+                                            }
+                                        );
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                        await page.CloseAsync();
+                    }
+                }
+                catch (Exception)
+                { }
+            });
 
             Task.WaitAll(
                 googleTask,
@@ -1619,7 +1625,7 @@ InstgramResultsList.Add(
                     /////places
                     await page.GoToAsync(APIs.PlacesReviews_Endpoint + query);
                     await page.ClickAsync("#searchbox-searchbutton");
-                    await Task.Delay(2000);
+                    await Task.Delay(3000);
                     await page.EvaluateExpressionAsync(
                         "document.getElementsByClassName('TFQHme')[0].parentNode.scrollBy(0,1000)"
                     );
