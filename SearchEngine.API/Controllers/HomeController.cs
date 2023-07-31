@@ -135,68 +135,76 @@ namespace SearchEngine.API.Controllers
                     var content = await page.GetContentAsync();
                     HtmlDocument htmlDocument = new();
                     htmlDocument.LoadHtml(content);
-
-                    var filters = htmlDocument.DocumentNode.SelectSingleNode(
-                        "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
-                    );
-
-                    var filtersNames = new List<string>();
-
-                    var Results = htmlDocument.DocumentNode.ChildNodes
-                        .Descendants("a")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
-                        .ToList();
-                    foreach (var result in filters.ChildNodes)
+                    try
                     {
-                        try
-                        {
-                            if (result.Name == "a")
-                            {
-                                var link = result.Attributes["href"].Value;
-                                googleEngineResult.Filters.Add(result.InnerText, link);
-                            }
-                            else if (result.Name == "div")
-                            {
-                                var link = result.Descendants("a").ToList()[0].Attributes[
-                                    "href"
-                                ].Value;
-                                googleEngineResult.Filters.Add(result.InnerText, link);
-                            }
-                        }
-                        catch (Exception) { }
-                    }
+                        var filters = htmlDocument.DocumentNode.SelectSingleNode(
+                       "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
+                   );
 
-                    var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
-                        .Descendants("span")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(
-                            y =>
-                                y.ParentNode.Attributes["class"].Value
-                                == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
-                        )
-                        .ToList();
+                        var filtersNames = new List<string>();
 
-                    //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
-                    googleEngineResult.genericGoogleResults = new();
-                    var counter = 0;
-                    foreach (var item in Results)
-                    {
-                        try
+                        var Results = htmlDocument.DocumentNode.ChildNodes
+                            .Descendants("a")
+                            .Where(r => r.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                            .ToList();
+                        foreach (var result in filters.ChildNodes)
                         {
-                            googleEngineResult.genericGoogleResults.Add(
-                                new GenericGoogleResult()
+                            try
+                            {
+                                if (result.Name == "a")
                                 {
-                                    Type = "Google",
-                                    Header = item.ChildNodes[1].InnerText,
-                                    Link = item.ChildNodes[2].InnerText,
-                                    Description = ListOfDesc[counter].InnerText
+                                    var link = result.Attributes["href"].Value;
+                                    googleEngineResult.Filters.Add(result.InnerText, link);
                                 }
-                            );
-                            counter++;
+                                else if (result.Name == "div")
+                                {
+                                    var link = result.Descendants("a").ToList()[0].Attributes[
+                                        "href"
+                                    ].Value;
+                                    googleEngineResult.Filters.Add(result.InnerText, link);
+                                }
+                            }
+                            catch (Exception) { }
                         }
-                        catch (Exception) { }
+
+                        var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
+                            .Descendants("span")
+                            .Where(r => r.ParentNode.Attributes["class"] != null)
+                            .Where(
+                                y =>
+                                    y.ParentNode.Attributes["class"].Value
+                                    == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
+                            )
+                            .ToList();
+
+                        //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
+                        googleEngineResult.genericGoogleResults = new();
+                        var counter = 0;
+                        foreach (var item in Results)
+                        {
+                            try
+                            {
+                                googleEngineResult.genericGoogleResults.Add(
+                                    new GenericGoogleResult()
+                                    {
+                                        Type = "Google",
+                                        Header = item.ChildNodes[1].InnerText,
+                                        Link = item.ChildNodes[2].InnerText,
+                                        Description = ListOfDesc[counter].InnerText
+                                    }
+                                );
+                                counter++;
+                            }
+                            catch (Exception) { }
+                        }
                     }
+                    catch (Exception)
+                    {
+
+                        
+                    }
+                   
 
                     googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
 
@@ -475,7 +483,9 @@ namespace SearchEngine.API.Controllers
                     ////////////////////////////////////////////////////////////////////
                     /////places
                     await page.GoToAsync(APIs.PlacesReviews_Endpoint + query);
+                    await Task.Delay(2000);
                     await page.ClickAsync("#searchbox-searchbutton");
+                   
                     await Task.Delay(2000);
                     await page.EvaluateExpressionAsync(
                         "document.getElementsByClassName('TFQHme')[0].parentNode.scrollBy(0,1000)"
