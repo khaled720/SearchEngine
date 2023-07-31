@@ -151,7 +151,7 @@ namespace SearchEngine.API.Controllers
                         new ViewPortOptions() { IsLandscape = true, IsMobile = false }
                     );
                     await page.TypeAsync(".cdx-text-input__input", query);
-                    await Task.Delay(5000);
+                    await Task.Delay(10000);
                     ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
 
 

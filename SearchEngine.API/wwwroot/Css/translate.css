@@ -8,17 +8,12 @@
 
 }
 @keyframes fade {
-    33% {
-    opacity:0;
+    0% {
+    opacity:1;
     }
 
-    66% {
-      opacity:1;
-    }
-
-    99% {
-    
-    opacity:0
+    100% {
+        opacity: 0;
     }
 }
 

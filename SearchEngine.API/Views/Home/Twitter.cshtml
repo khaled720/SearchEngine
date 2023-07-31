@@ -1,7 +1,9 @@
 ﻿@using SearchEngine.API.Controllers;
 @using SearchEngineWeb.Models;
 @model List<GenericGoogleResult>
-
+@{
+Layout="_Layout";
+}
 
 @await Html.PartialAsync("_Twitter",Model)
 

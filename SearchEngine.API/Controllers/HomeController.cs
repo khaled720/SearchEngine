@@ -24,7 +24,7 @@ namespace SearchEngine.API.Controllers
             var browser = await Puppeteer.LaunchAsync(
                 new LaunchOptions
                 {
-                    Headless = false,
+                    Headless = true,
                     DefaultViewport = null,
                     Args = args,
                     Timeout = 0
@@ -113,106 +113,7 @@ namespace SearchEngine.API.Controllers
                 }
             );
 
-            GoogleEngineResult googleEngineResult = new GoogleEngineResult();
-            googleEngineResult.Query = query;
-            var googleTask = Task.Run(async () =>
-            {
-                using (var page = await browser.NewPageAsync())
-                {
-                    //await page.SetExtraHttpHeadersAsync(headers);
-                    await page.GoToAsync(APIs.GoogleEngine_Endpoint + "search?q=" + query);
-                    //       await page.WaitForSelectorAsync("#APjFqb");
-                    //      await page.FocusAsync("#APjFqb");
-                    //      await page.Keyboard.TypeAsync(query);
-                    //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
-                    //     await page.WaitForNavigationAsync();
 
-                    await page.SetJavaScriptEnabledAsync(true);
-                    //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
-
-
-
-                    var content = await page.GetContentAsync();
-                    HtmlDocument htmlDocument = new();
-                    htmlDocument.LoadHtml(content);
-
-                    var filters = htmlDocument.DocumentNode.SelectSingleNode(
-                        "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
-                    );
-
-                    var filtersNames = new List<string>();
-
-                    var Results = htmlDocument.DocumentNode.ChildNodes
-                        .Descendants("a")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
-                        .ToList();
-                    foreach (var result in filters.ChildNodes)
-                    {
-                        try
-                        {
-                            if (result.Name == "a")
-                            {
-                                var link = result.Attributes["href"].Value;
-                                googleEngineResult.Filters.Add(result.InnerText, link);
-                            }
-                            else if (result.Name == "div")
-                            {
-                                var link = result.Descendants("a").ToList()[0].Attributes[
-                                    "href"
-                                ].Value;
-                                googleEngineResult.Filters.Add(result.InnerText, link);
-                            }
-                        }
-                        catch (Exception) { }
-                    }
-
-                    var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
-                        .Descendants("span")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(
-                            y =>
-                                y.ParentNode.Attributes["class"].Value
-                                == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
-                        )
-                        .ToList();
-
-                    //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
-                    googleEngineResult.genericGoogleResults = new();
-                    var counter = 0;
-                    foreach (var item in Results)
-                    {
-                        try
-                        {
-                            googleEngineResult.genericGoogleResults.Add(
-                                new GenericGoogleResult()
-                                {
-                                    Type = "Google",
-                                    Header = item.ChildNodes[1].InnerText,
-                                    Link = item.ChildNodes[2].InnerText,
-                                    Description = ListOfDesc[counter].InnerText
-                                }
-                            );
-                            counter++;
-                        }
-                        catch (Exception) { }
-                    }
-
-                    googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
-
-                    //       counter++;
-                    //     }
-
-
-
-
-
-
-                    await page.CloseAsync();
-                }
-            });
-
-            /////////////////////////////////////////////////////////////////////////
 
             var wikipediaResults = new List<WikipediaResult>();
 
@@ -226,7 +127,7 @@ namespace SearchEngine.API.Controllers
                         new ViewPortOptions() { IsLandscape = true, IsMobile = false }
                     );
                     await page.TypeAsync(".cdx-text-input__input", query);
-                    await Task.Delay(5000);
+                    await Task.Delay(10000);
                     ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
 
 
@@ -294,6 +195,117 @@ namespace SearchEngine.API.Controllers
             });
 
             //////////////////////////////////////
+            GoogleEngineResult googleEngineResult = new GoogleEngineResult();
+            googleEngineResult.Query = query;
+            var googleTask = Task.Run(async () =>
+            {
+                using (var page = await browser.NewPageAsync())
+                {
+                    //await page.SetExtraHttpHeadersAsync(headers);
+                    await page.GoToAsync(APIs.GoogleEngine_Endpoint + "search?q=" + query,timeout:0);
+                    //       await page.WaitForSelectorAsync("#APjFqb");
+                    //      await page.FocusAsync("#APjFqb");
+                    //      await page.Keyboard.TypeAsync(query);
+                    //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
+                    //     await page.WaitForNavigationAsync();
+
+                    await page.SetJavaScriptEnabledAsync(true);
+                    //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
+
+
+
+                    var content = await page.GetContentAsync();
+                    HtmlDocument htmlDocument = new();
+                    htmlDocument.LoadHtml(content);
+
+                    var filters = htmlDocument.DocumentNode.SelectSingleNode(
+                        "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
+                    );
+
+                    var filtersNames = new List<string>();
+
+                    var Results = htmlDocument.DocumentNode.ChildNodes
+                        .Descendants("a")
+                        .Where(r => r.ParentNode.Attributes["class"] != null)
+                        .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                        .ToList();
+                    try
+                    {
+  foreach (var result in filters.ChildNodes)
+                    {
+                        try
+                        {
+                            if (result.Name == "a")
+                            {
+                                var link = result.Attributes["href"].Value;
+                                googleEngineResult.Filters.Add(result.InnerText, link);
+                            }
+                            else if (result.Name == "div")
+                            {
+                                var link = result.Descendants("a").ToList()[0].Attributes[
+                                    "href"
+                                ].Value;
+                                googleEngineResult.Filters.Add(result.InnerText, link);
+                            }
+                        }
+                        catch (Exception) { }
+                    }
+
+                    }
+                    catch (Exception)
+                    {
+
+                     
+                    }
+                  
+                    var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
+                        .Descendants("span")
+                        .Where(r => r.ParentNode.Attributes["class"] != null)
+                        .Where(
+                            y =>
+                                y.ParentNode.Attributes["class"].Value
+                                == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
+                        )
+                        .ToList();
+
+                    //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
+                    googleEngineResult.genericGoogleResults = new();
+                    var counter = 0;
+                    foreach (var item in Results)
+                    {
+                        try
+                        {
+                            googleEngineResult.genericGoogleResults.Add(
+                                new GenericGoogleResult()
+                                {
+                                    Type = "Google",
+                                    Header = item.ChildNodes[1].InnerText,
+                                    Link = item.ChildNodes[2].InnerText,
+                                    Description = ListOfDesc[counter].InnerText
+                                }
+                            );
+                            counter++;
+                        }
+                        catch (Exception) { }
+                    }
+
+                    googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
+
+                    //       counter++;
+                    //     }
+
+
+
+
+
+
+                    await page.CloseAsync();
+                }
+            });
+
+            /////////////////////////////////////////////////////////////////////////
+
+            
 
             List<GenericGoogleResult> InstgramResultsList = new();
 
@@ -307,7 +319,8 @@ namespace SearchEngine.API.Controllers
                     await page.FocusAsync("#APjFqb");
                     await page.Keyboard.TypeAsync("site:Instagram.com " + query);
                     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
-                    await page.WaitForNavigationAsync();
+                    // await page.WaitForNavigationAsync();
+                    await Task.Delay(2000);
 
                     await page.SetJavaScriptEnabledAsync(true);
                     //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
@@ -334,7 +347,9 @@ namespace SearchEngine.API.Controllers
                     var counter = 0;
                     foreach (var item in Results)
                     {
-                        InstgramResultsList.Add(
+                        try
+                        {
+InstgramResultsList.Add(
                             new GenericGoogleResult()
                             {
                                 Type = "Instagram",
@@ -346,6 +361,13 @@ namespace SearchEngine.API.Controllers
                                 Description = ListOfDesc[counter].InnerText
                             }
                         );
+                        }
+                        catch (Exception)
+                        {
+
+                            continue;
+                        }
+                        
                         counter++;
                     }
 
@@ -364,7 +386,8 @@ namespace SearchEngine.API.Controllers
                     await page.FocusAsync("#APjFqb");
                     await page.Keyboard.TypeAsync("site:twitter.com " + query);
                     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
-                    await page.WaitForNavigationAsync();
+                    await Task.Delay(2000);
+                 ///await page.WaitForNavigationAsync();
                     var content1 = await page.GetContentAsync();
                     HtmlDocument htmlDocument1 = new();
                     htmlDocument1.LoadHtml(content1);
@@ -385,7 +408,9 @@ namespace SearchEngine.API.Controllers
                     var counter = 0;
                     foreach (var item in Results1)
                     {
-                        twitterResultsList.Add(
+                        try
+                        {
+       twitterResultsList.Add(
                             new GenericGoogleResult()
                             {
                                 Type = "Twitter",
@@ -397,6 +422,13 @@ namespace SearchEngine.API.Controllers
                                 Description = ListOfDesc[counter].InnerText
                             }
                         );
+                        }
+                        catch (Exception)
+                        {
+
+                            continue;
+                        }
+                 
                         counter++;
                     }
                 }
@@ -474,7 +506,8 @@ namespace SearchEngine.API.Controllers
 
                     ////////////////////////////////////////////////////////////////////
                     /////places
-                    await page.GoToAsync(APIs.PlacesReviews_Endpoint + query);
+                    await page.GoToAsync(APIs.PlacesReviews_Endpoint + query,timeout:0);
+                    await Task.Delay(2000);
                     await page.ClickAsync("#searchbox-searchbutton");
                     await Task.Delay(2000);
                     await page.EvaluateExpressionAsync(
@@ -963,7 +996,7 @@ namespace SearchEngine.API.Controllers
             var browser = await Puppeteer.LaunchAsync(
                 new LaunchOptions
                 {
-                    Headless = false,
+                    Headless = true,
                     DefaultViewport = null,
                     Args = args
                 }
@@ -1266,7 +1299,7 @@ namespace SearchEngine.API.Controllers
                         new ViewPortOptions() { IsLandscape = true, IsMobile = false }
                     );
                     await page.TypeAsync(".cdx-text-input__input", query);
-                    await Task.Delay(3000);
+                    await Task.Delay(10000);
                     ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
 
 
@@ -1390,25 +1423,34 @@ namespace SearchEngine.API.Controllers
                     var counter = 0;
                     foreach (var item in Results)
                     {
-                        InstgramResultsList.Add(
-                            new GenericGoogleResult()
-                            {
-                                Type = "Instagram",
-                                Header = item.ChildNodes[1].InnerText,
-                                Link = item.ChildNodes[2].InnerText
-                                    .Replace("instagram.com", "")
-                                    .Replace(" > ", "/")
-                                    .Replace(" › ", "instagram.com/"),
-                                Description = ListOfDesc[counter].InnerText
-                            }
-                        );
+
+                        try
+                        {
+                            InstgramResultsList.Add(
+                                new GenericGoogleResult()
+                                {
+                                    Type = "Instagram",
+                                    Header = item.ChildNodes[1].InnerText,
+                                    Link = item.ChildNodes[2].InnerText
+                                        .Replace("instagram.com", "")
+                                        .Replace(" > ", "/")
+                                        .Replace(" › ", "instagram.com/"),
+                                    Description = ListOfDesc[counter].InnerText
+                                }
+                            );
+
+                        }
+                        catch (Exception) {
+                            continue;
+                        }
                         counter++;
                     }
 
                     await page.CloseAsync();
                 }
+                await browser.CloseAsync();
             });
-
+            
             return View(InstgramResultsList);
         }
 
@@ -1455,7 +1497,9 @@ namespace SearchEngine.API.Controllers
                     var counter = 0;
                     foreach (var item in Results1)
                     {
-                        TwitterResultsList.Add(
+                        try
+                        {
+   TwitterResultsList.Add(
                             new GenericGoogleResult()
                             {
                                 Type = "Twitter",
@@ -1467,6 +1511,13 @@ namespace SearchEngine.API.Controllers
                                 Description = ListOfDesc[counter].InnerText
                             }
                         );
+                        }
+                        catch (Exception)
+                        {
+
+                            continue;
+                        }
+                     
                         counter++;
                     }
                 }
@@ -1497,7 +1548,8 @@ namespace SearchEngine.API.Controllers
                     //await page.EvaluateExpressionAsync("window.scrollBy(0, window.innerHeight)")
                     //   await page.ClickAsync("#searchbox-searchbutton");
                     //  await Task.Delay(10000);
-                    await page.WaitForXPathAsync(
+                    await page.WaitForXPathAsync
+                    (
                         "/html/body/c-wiz[2]/div/div/c-wiz/c-wiz/c-wiz/section/div/div/div"
                     );
                     var content = await page.GetContentAsync();

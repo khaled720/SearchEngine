@@ -1,6 +1,9 @@
 ﻿document.getElementById("subBtn").onclick =
     function () {
+
+        document.getElementById("ltext").innerText = "";
         var stext = document.getElementById("stext").value;
+        if (stext == "" || stext == null) return; 
         var sldropdownitemValues = document.getElementById("sl").value.split("-");
 
         var sl = sldropdownitemValues[0];
@@ -12,8 +15,10 @@
 
         var tlIsRigthToLeft = tldropdownitemValues[1] == "False" ? false : true;
 
+     
+  
+        document.getElementById("ltext").style.animation = "fade 4s infinite ease-in-out";
 
-        document.getElementById("loading").innerText = "Loading ... ";
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
@@ -28,7 +33,8 @@
                    document.getElementById("ltext").innerHTML = "<span class='text-danger'>" + jsonResponse["desc"] +"</span>";
                 }
 
-                document.getElementById("loading").innerText = "";
+
+                document.getElementById("ltext").style.animation = "";
             }
         };
 
@@ -36,7 +42,8 @@
         {
             document.getElementById("ltext").innerHTML = "<span class='text-danger'>Something Went Wrong</span>";
 
-            document.getElementById("loading").innerText = "";
+
+            document.getElementById("ltext").style.animation = "";
 
         }
 

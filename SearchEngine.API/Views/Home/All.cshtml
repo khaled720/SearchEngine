@@ -24,17 +24,11 @@
 
 
 
-<div class="row">
 
-    <div class="col-6">
         @await Html.PartialAsync("_instagram",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Instagram).First().Result)
    
-    </div>
-
-
-    <div class="col-6">
+ 
         @await Html.PartialAsync("_twitter",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Twitter).First().Result)
 
-    </div>
 
-</div>
+
