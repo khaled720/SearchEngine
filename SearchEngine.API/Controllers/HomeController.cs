@@ -48,7 +48,7 @@ namespace SearchEngine.API.Controllers
             var browser = await Puppeteer.LaunchAsync(
                 new LaunchOptions
                 {
-                    Headless = false ,
+                    Headless = true ,
                     DefaultViewport = null,
                     Args = args,
                     Timeout = 0
@@ -1297,7 +1297,7 @@ InstgramResultsList.Add(
             var browser = await Puppeteer.LaunchAsync(
                 new LaunchOptions
                 {
-                    Headless = false,
+                    Headless = true,
                     DefaultViewport = null,
                     Args = args
                 }
