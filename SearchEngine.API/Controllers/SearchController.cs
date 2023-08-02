@@ -111,6 +111,30 @@ namespace SearchEngine.API.Controllers
                                 )
                                 .ToList();
 
+
+
+
+                            await page.ClickAsync("#pnnext");
+                            await page.WaitForNavigationAsync();
+
+                            var Results2ndPage = htmlDocument.DocumentNode.ChildNodes
+                             .Descendants("a")
+                             .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                             .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
+                             .ToList();
+
+                            var ListOfDesc2ndPage = htmlDocument.DocumentNode.ChildNodes
+                                .Descendants("span")
+                                .Where(r => r.ParentNode.Attributes["class"] != null)
+                                .Where(
+                                    y =>
+                                        y.ParentNode.Attributes["class"].Value
+                                        == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
+                                )
+                                .ToList();
+
+                            Results.AddRange(Results2ndPage);
+                            ListOfDesc.AddRange(ListOfDesc);
                             //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
                             googleEngineResult.genericGoogleResults = new();
                             var counter = 0;
@@ -722,6 +746,9 @@ namespace SearchEngine.API.Controllers
                         // await page.SetExtraHttpHeadersAsync(headers);
 
                         await page.GoToAsync(APIs.WikiPedia_Endpoint, timeout: 0);
+                        await page.SetViewportAsync(
+                new ViewPortOptions() { IsLandscape = true, IsMobile = false, Width = 2000, Height = 3000 }
+            );
                         // await page.EvaluateExpressionAsync("");
                         //      await page.WaitForNavigationAsync();
                         await page.TypeAsync(".cdx-text-input__input", query);

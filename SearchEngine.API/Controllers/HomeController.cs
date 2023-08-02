@@ -133,6 +133,31 @@ namespace SearchEngine.API.Controllers
                                 )
                                 .ToList();
 
+                            ////////////////Second Page Fetching
+                            await page.ClickAsync("#pnnext");
+                            await page.WaitForNavigationAsync();
+
+                            var Results2ndPage = htmlDocument.DocumentNode.ChildNodes
+                             .Descendants("a")
+                             .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                             .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
+                             .ToList();
+
+                            var ListOfDesc2ndPage = htmlDocument.DocumentNode.ChildNodes
+                                .Descendants("span")
+                                .Where(r => r.ParentNode.Attributes["class"] != null)
+                                .Where(
+                                    y =>
+                                        y.ParentNode.Attributes["class"].Value
+                                        == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
+                                )
+                                .ToList();
+
+                            Results.AddRange(Results2ndPage);
+                            ListOfDesc.AddRange(ListOfDesc);
+
+                            //////////////////////////////////////
+
                             //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
                             googleEngineResult.genericGoogleResults = new();
                             var counter = 0;
@@ -653,6 +678,8 @@ InstgramResultsList.Add(
 
             //Images
             var imagesResult = new GoogleEngineResult();
+            imagesResult.Images = new List<string>();
+
             var imagesTask = Task.Run(async () =>
             {
                 using (var page = await browser.NewPageAsync())
@@ -727,6 +754,8 @@ InstgramResultsList.Add(
             ///
 
 
+
+            //Wikipedia
             /////////////////////////////////////////
 
 
@@ -743,7 +772,10 @@ InstgramResultsList.Add(
                         
                         await page.GoToAsync(APIs.WikiPedia_Endpoint, timeout: 0);
                         // await page.EvaluateExpressionAsync("");
-                  //      await page.WaitForNavigationAsync();
+                        //      await page.WaitForNavigationAsync();
+                        await page.SetViewportAsync(
+                    new ViewPortOptions() { IsLandscape = true, IsMobile = false, Width = 2000, Height = 3000 }
+                );
                         await page.TypeAsync(".cdx-text-input__input", query);
                         await Task.Delay(5000);
                         ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
@@ -1158,18 +1190,8 @@ InstgramResultsList.Add(
             GoogleEngineResult googleEngineResult = new();
 
             googleEngineResult.Query = query;
-            try
-            {
-                Dictionary<string, string> headers = new Dictionary<string, string>();
-                headers.Add(
-                    "user-agent",
-                    "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36"
-                );
-                headers.Add(
-                    "accept",
-                    "text/html,application/xhtml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
-                );
-                ////////////////////////////////////////////////////////
+         
+               
                 /////////////////////////////////////////////////
                 //////////////////////////////////////////////////
                 //GOOGLE Search TASK General
@@ -1178,102 +1200,129 @@ InstgramResultsList.Add(
                 {
                     using (var page = await browser.NewPageAsync())
                     {
-                        await page.SetExtraHttpHeadersAsync(headers);
-                        await page.GoToAsync(APIs.GoogleEngine_Endpoint + "search?q=" + query);
-                        //       await page.WaitForSelectorAsync("#APjFqb");
-                        //      await page.FocusAsync("#APjFqb");
-                        //      await page.Keyboard.TypeAsync(query);
-                        //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
-                        //     await page.WaitForNavigationAsync();
 
-                        await page.SetJavaScriptEnabledAsync(true);
-                        //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
-
-
-
-                        var content = await page.GetContentAsync();
-                        HtmlDocument htmlDocument = new();
-                        htmlDocument.LoadHtml(content);
-
-                        var filters = htmlDocument.DocumentNode.SelectSingleNode(
-                            "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
-                        );
-
-                        var filtersNames = new List<string>();
-
-                        var Results = htmlDocument.DocumentNode.ChildNodes
-                            .Descendants("a")
-                            .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
-                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
-                            .ToList();
-                        foreach (var result in filters.ChildNodes)
+                        try
                         {
-                            try
-                            {
-                                if (result.Name == "a")
-                                {
-                                    var link = result.Attributes["href"].Value;
-                                    googleEngineResult.Filters.Add(result.InnerText, link);
-                                }
-                                else if (result.Name == "div")
-                                {
-                                    var link = result.Descendants("a").ToList()[0].Attributes[
-                                        "href"
-                                    ].Value;
-                                    googleEngineResult.Filters.Add(result.InnerText, link);
-                                }
-                            }
-                            catch (Exception) { }
-                        }
+                            await page.GoToAsync(APIs.GoogleEngine_Endpoint + "search?q=" + query);
 
-                        var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
-                            .Descendants("span")
-                            .Where(r => r.ParentNode.Attributes["class"] != null)
-                            .Where(
-                                y =>
-                                    y.ParentNode.Attributes["class"].Value
-                                    == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
-                            )
-                            .ToList();
+                            //       await page.WaitForSelectorAsync("#APjFqb");
+                            //      await page.FocusAsync("#APjFqb");
+                            //      await page.Keyboard.TypeAsync(query);
+                            //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
+                            //     await page.WaitForNavigationAsync();
 
-                        //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
+                            await page.SetJavaScriptEnabledAsync(true);
+                            //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
 
-                        var counter = 0;
-                        foreach (var item in Results)
-                        {
-                            googleEngineResult.genericGoogleResults.Add(
-                                new GenericGoogleResult()
-                                {
-                                    Type = "Google",
-                                    Header = item.ChildNodes[1].InnerText,
-                                    Link = item.ChildNodes[2].InnerText
-                                        .Replace("instagram.com", "")
-                                        .Replace(" > ", "/")
-                                        .Replace(" › ", "instagram.com/"),
-                                    Description = ListOfDesc[counter].InnerText
-                                }
+
+
+                            var content = await page.GetContentAsync();
+                            HtmlDocument htmlDocument = new();
+                            htmlDocument.LoadHtml(content);
+
+                            var filters = htmlDocument.DocumentNode.SelectSingleNode(
+                                "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
                             );
-                            counter++;
-                        }
 
-                        googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
+                            var filtersNames = new List<string>();
 
-                        //       counter++;
-                        //     }
+                            var Results = htmlDocument.DocumentNode.ChildNodes
+                                .Descendants("a")
+                                .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                                .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
+                                .ToList();
+                            foreach (var result in filters.ChildNodes)
+                            {
+                                try
+                                {
+                                    if (result.Name == "a")
+                                    {
+                                        var link = result.Attributes["href"].Value;
+                                        googleEngineResult.Filters.Add(result.InnerText, link);
+                                    }
+                                    else if (result.Name == "div")
+                                    {
+                                        var link = result.Descendants("a").ToList()[0].Attributes[
+                                            "href"
+                                        ].Value;
+                                        googleEngineResult.Filters.Add(result.InnerText, link);
+                                    }
+                                }
+                                catch (Exception) { }
+                            }
+
+                            var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
+                                .Descendants("span")
+                                .Where(r => r.ParentNode.Attributes["class"] != null)
+                                .Where(
+                                    y =>
+                                        y.ParentNode.Attributes["class"].Value
+                                        == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
+                                )
+                                .ToList();
+
+                            //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
 
 
+                            await page.ClickAsync("#pnnext");
+                            await page.WaitForNavigationAsync();
+
+                             var Results2ndPage= htmlDocument.DocumentNode.ChildNodes
+                              .Descendants("a")
+                              .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                              .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
+                              .ToList();
+    
+                            var ListOfDesc2ndPage = htmlDocument.DocumentNode.ChildNodes
+                                .Descendants("span")
+                                .Where(r => r.ParentNode.Attributes["class"] != null)
+                                .Where(
+                                    y =>
+                                        y.ParentNode.Attributes["class"].Value
+                                        == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
+                                )
+                                .ToList();
+                            
+                            Results.AddRange(Results2ndPage);
+                            ListOfDesc.AddRange(ListOfDesc);
+
+                           
+
+                            var counter = 0;
+                            foreach (var item in Results)
+                            {
+                                googleEngineResult.genericGoogleResults.Add(
+                                    new GenericGoogleResult()
+                                    {
+                                        Type = "Google",
+                                        Header = item.ChildNodes[1].InnerText,
+                                        Link = item.ChildNodes[2].InnerText
+                                            .Replace("instagram.com", "")
+                                            .Replace(" > ", "/")
+                                            .Replace(" › ", "instagram.com/"),
+                                        Description = ListOfDesc[counter].InnerText
+                                    }
+                                );
+                                counter++;
+                            }
+
+                            googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
+
+                            //       counter++;
+                            //     }
 
 
-
-
+                       
                         await page.CloseAsync();
+                        
+                       }catch (Exception e) { }
                     }
                 });
 
                 //////////////////////////////////////////////////////////////////
                 //////////////////////////////////////////////////////////////////////
-            }
-            catch (Exception e) { }
+            
+           
 
             var sr = new SearchResult()
             {
@@ -1313,11 +1362,13 @@ InstgramResultsList.Add(
                 ;                     await page.SetJavaScriptEnabledAsync(true);
                     
                     await page.GoToAsync(APIs.WikiPedia_Endpoint,timeout:0);
-   
+                    await page.SetViewportAsync(
+                               new ViewPortOptions() { IsLandscape = true, IsMobile = false, Width = 2000, Height = 3000 }
+                           );
 
-             /*       await page.SetViewportAsync(
-                        new ViewPortOptions() { IsLandscape = true, IsMobile = false }
-                    );*/  
+                    /*       await page.SetViewportAsync(
+                               new ViewPortOptions() { IsLandscape = true, IsMobile = false }
+                           );*/
                     await page.TypeAsync(".cdx-text-input__input", query);
                  
                  ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
