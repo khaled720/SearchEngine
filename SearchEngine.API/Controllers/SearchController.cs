@@ -70,9 +70,8 @@ namespace SearchEngine.API.Controllers
 
                             var Results = htmlDocument.DocumentNode.ChildNodes
                                 .Descendants("a")
-                                .Where(r => r.ParentNode.Attributes["class"] != null)
-                                .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
-                                .ToList();
+                                .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf").ToList();
                             try
                             {
                                 foreach (var result in filters.ChildNodes)
@@ -188,8 +187,8 @@ namespace SearchEngine.API.Controllers
                         htmlDocument.LoadHtml(content);
                         var Results = htmlDocument.DocumentNode.ChildNodes
                             .Descendants("a")
-                            .Where(r => r.ParentNode.Attributes["class"] != null)
-                            .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                            .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                             .ToList();
                         var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
                             .Descendants("span")
@@ -258,8 +257,8 @@ namespace SearchEngine.API.Controllers
                         htmlDocument1.LoadHtml(content1);
                         var Results1 = htmlDocument1.DocumentNode.ChildNodes
                             .Descendants("a")
-                            .Where(r => r.ParentNode.Attributes["class"] != null)
-                            .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                                 .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                             .ToList();
                         var ListOfDesc = htmlDocument1.DocumentNode.ChildNodes
                             .Descendants("span")

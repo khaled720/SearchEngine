@@ -91,8 +91,8 @@ namespace SearchEngine.API.Controllers
 
                             var Results = htmlDocument.DocumentNode.ChildNodes
                                 .Descendants("a")
-                                .Where(r => r.ParentNode.Attributes["class"] != null)
-                                .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                                      .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                                 .ToList();
                             try
                             {
@@ -209,8 +209,8 @@ namespace SearchEngine.API.Controllers
                     htmlDocument.LoadHtml(content);
                     var Results = htmlDocument.DocumentNode.ChildNodes
                         .Descendants("a")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                           .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                         .ToList();
                     var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
                         .Descendants("span")
@@ -279,8 +279,8 @@ InstgramResultsList.Add(
                     htmlDocument1.LoadHtml(content1);
                     var Results1 = htmlDocument1.DocumentNode.ChildNodes
                         .Descendants("a")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                            .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                         .ToList();
                     var ListOfDesc = htmlDocument1.DocumentNode.ChildNodes
                         .Descendants("span")
@@ -1203,8 +1203,8 @@ InstgramResultsList.Add(
 
                         var Results = htmlDocument.DocumentNode.ChildNodes
                             .Descendants("a")
-                            .Where(r => r.ParentNode.Attributes["class"] != null)
-                            .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                            .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                             .ToList();
                         foreach (var result in filters.ChildNodes)
                         {
@@ -1309,18 +1309,23 @@ InstgramResultsList.Add(
                 using (var page = await browser.NewPageAsync())
                 {
                     // await page.SetExtraHttpHeadersAsync(headers);
-                    await page.GoToAsync(APIs.WikiPedia_Endpoint);
-                    await page.SetViewportAsync(
+                    await page.SetUserAgentAsync("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36")
+                ;                     await page.SetJavaScriptEnabledAsync(true);
+                    
+                    await page.GoToAsync(APIs.WikiPedia_Endpoint,timeout:0);
+   
+
+             /*       await page.SetViewportAsync(
                         new ViewPortOptions() { IsLandscape = true, IsMobile = false }
-                    );
+                    );*/  
                     await page.TypeAsync(".cdx-text-input__input", query);
-                    await Task.Delay(10000);
-                    ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
+                 
+                 ///  var resultsList= await page.QuerySelectorAsync(".cdx-menu__listbox");
 
 
                     //await page.EvaluateExpressionAsync("window.scrollBy(0, window.innerHeight)")
                     //   await page.ClickAsync("#searchbox-searchbutton");
-                    // await Task.Delay(10000);
+                     await Task.Delay(5000);
                     //        await page.WaitForXPathAsync("/html/body/c-wiz[2]/div/div/c-wiz/c-wiz/c-wiz/section/div/div/div");
                     var content = await page.GetContentAsync();
                     HtmlDocument htmlDocument = new();
@@ -1423,8 +1428,8 @@ InstgramResultsList.Add(
                     htmlDocument.LoadHtml(content);
                     var Results = htmlDocument.DocumentNode.ChildNodes
                         .Descendants("a")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                             .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                         .ToList();
                     var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
                         .Descendants("span")
@@ -1497,8 +1502,8 @@ InstgramResultsList.Add(
                     htmlDocument1.LoadHtml(content1);
                     var Results1 = htmlDocument1.DocumentNode.ChildNodes
                         .Descendants("a")
-                        .Where(r => r.ParentNode.Attributes["class"] != null)
-                        .Where(y => y.ParentNode.Attributes["class"].Value == "yuRUbf")
+                .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                         .ToList();
                     var ListOfDesc = htmlDocument1.DocumentNode.ChildNodes
                         .Descendants("span")
