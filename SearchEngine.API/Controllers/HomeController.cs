@@ -59,153 +59,163 @@ namespace SearchEngine.API.Controllers
 
             GoogleEngineResult googleEngineResult = new GoogleEngineResult();
             googleEngineResult.Query = query;
-            var googleTask = Task.Run(async () =>
-            {
-                using (var page = await browser.NewPageAsync())
-                {
-                    try
-                    {
-                        //await page.SetExtraHttpHeadersAsync(headers);
-                        await page.GoToAsync(APIs.GoogleEngine_Endpoint + "search?q=" + query, timeout: 0);
-                        //       await page.WaitForSelectorAsync("#APjFqb");
-                        //      await page.FocusAsync("#APjFqb");
-                        //      await page.Keyboard.TypeAsync(query);
-                        //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
-                        //     await page.WaitForNavigationAsync();
+            var googleTask =
+                           Task.Run(async () =>
+                          {
+                              using (var page = await browser.NewPageAsync())
+                              {
 
-                        await page.SetJavaScriptEnabledAsync(true);
-                        //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
+                                  try
+                                  {
+                                      await page.SetViewportAsync(
+                                   new ViewPortOptions() { IsLandscape = true, IsMobile = false, Width = 1700 }
+                               );
+
+                                      await page.GoToAsync(APIs.GoogleEngine_Endpoint + "search?q=" + query);
+                                      //       await page.WaitForSelectorAsync("#APjFqb");
+                                      //      await page.FocusAsync("#APjFqb");
+                                      //      await page.Keyboard.TypeAsync(query);
+                                      //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
+                                      //     await page.WaitForNavigationAsync();
+
+                                      await page.SetJavaScriptEnabledAsync(true);
+                                      //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
+
+                                      await Task.Delay(3000);
+
+                                      var content = await page.GetContentAsync();
+                                      HtmlDocument htmlDocument = new();
+                                      htmlDocument.LoadHtml(content);
+
+                                      var filters = htmlDocument.DocumentNode.SelectSingleNode(
+                                          "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
+                                      );
+
+                                      var filtersNames = new List<string>();
+
+                                      var Results = htmlDocument.DocumentNode.ChildNodes
+                                          .Descendants("a")
+                                          .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
+                                          .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
+                                          .ToList();
+                                      if (filters != null)
+                                      {
 
 
-
-                        var content = await page.GetContentAsync();
-                        HtmlDocument htmlDocument = new();
-                        htmlDocument.LoadHtml(content);
-                        try
-                        {
-                            var filters = htmlDocument.DocumentNode.SelectSingleNode(
-                           "//*[@id=\"cnt\"]/div[5]/div/div/div[1]/div[1]/div"
-                       );
-
-                            var filtersNames = new List<string>();
-
-                            var Results = htmlDocument.DocumentNode.ChildNodes
-                                .Descendants("a")
-                                      .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
-                            .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
-                                .ToList();
-                            try
-                            {
-                                foreach (var result in filters.ChildNodes)
-                                {
-                                    try
-                                    {
-                                        if (result.Name == "a")
-                                        {
-                                            var link = result.Attributes["href"].Value;
-                                            googleEngineResult.Filters.Add(result.InnerText, link);
-                                        }
-                                        else if (result.Name == "div")
-                                        {
-                                            var link = result.Descendants("a").ToList()[0].Attributes[
+                                          foreach (var result in filters.ChildNodes)
+                                          {
+                                              try
+                                              {
+                                                  if (result.Name == "a")
+                                                  {
+                                                      var link = result.Attributes["href"].Value;
+                                                      googleEngineResult.Filters.Add(result.InnerText, link);
+                                                  }
+                                                  else if (result.Name == "div")
+                                                  {
+                                                      var link = result.Descendants("a").ToList()[0].Attributes[
                                                 "href"
                                             ].Value;
-                                            googleEngineResult.Filters.Add(result.InnerText, link);
-                                        }
-                                    }
-                                    catch (Exception) { }
-                                }
+                                                      googleEngineResult.Filters.Add(result.InnerText, link);
+                                                  }
+                                              }
+                                              catch (Exception)
+                                              {
+                                                  continue;
+                                              }
+                                          }
 
-                            }
-                            catch (Exception)
-                            {
+                                      }
+
+                                      var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
+                                          .Descendants("span")
+                                          .Where(r => r.ParentNode.Attributes["class"] != null)
+                                          .Where(
+                                              y =>
+                                                  y.ParentNode.Attributes["class"].Value
+                                                  == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
+                                          )
+                                          .ToList();
+
+                                      //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
 
 
-                            }
+                                      await page.ClickAsync("#pnnext");
+                                      await page.WaitForNavigationAsync();
 
-                            var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
-                                .Descendants("span")
-                                .Where(r => r.ParentNode.Attributes["class"] != null)
-                                .Where(
-                                    y =>
-                                        y.ParentNode.Attributes["class"].Value
-                                        == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
-                                )
-                                .ToList();
-
-                            ////////////////Second Page Fetching
-                            await page.ClickAsync("#pnnext");
-                            await page.WaitForNavigationAsync();
-
-                            var Results2ndPage = htmlDocument.DocumentNode.ChildNodes
+                                      var Results2ndPage = htmlDocument.DocumentNode.ChildNodes
                              .Descendants("a")
                              .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
                              .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                              .ToList();
 
-                            var ListOfDesc2ndPage = htmlDocument.DocumentNode.ChildNodes
-                                .Descendants("span")
-                                .Where(r => r.ParentNode.Attributes["class"] != null)
-                                .Where(
-                                    y =>
-                                        y.ParentNode.Attributes["class"].Value
-                                        == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
-                                )
-                                .ToList();
+                                      var ListOfDesc2ndPage = htmlDocument.DocumentNode.ChildNodes
+                                          .Descendants("span")
+                                          .Where(r => r.ParentNode.Attributes["class"] != null)
+                                          .Where(
+                                              y =>
+                                                  y.ParentNode.Attributes["class"].Value
+                                                  == "VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"
+                                          )
+                                          .ToList();
 
-                            Results.AddRange(Results2ndPage);
-                            ListOfDesc.AddRange(ListOfDesc);
-
-                            //////////////////////////////////////
-
-                            //   var wikiBox = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"rhs\"]/div/div/div[2]");
-                            googleEngineResult.genericGoogleResults = new();
-                            var counter = 0;
-                            foreach (var item in Results)
-                            {
-                                try
-                                {
-                                    googleEngineResult.genericGoogleResults.Add(
-                                        new GenericGoogleResult()
-                                        {
-                                            Type = "Google",
-                                            Header = item.ChildNodes[1].InnerText,
-                                            Link = item.ChildNodes[2].InnerText,
-                                            Description = ListOfDesc[counter].InnerText
-                                        }
-                                    );
-                                    counter++;
-                                }
-                                catch (Exception) { }
-                            }
-                        }
-                        catch (Exception)
-                        {
-
-
-                        }
-
-
-                        googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
-
-                        //       counter++;
-                        //     }
+                                      Results.AddRange(Results2ndPage);
+                                      ListOfDesc.AddRange(ListOfDesc);
 
 
 
+                                      var counter = 0;
+                                      if (Results != null)
+                                      {
+                                          foreach (var item in Results)
+                                          {
+                                              try
+                                              {
+                                                  googleEngineResult.genericGoogleResults.Add(
+                                                      new GenericGoogleResult()
+                                                      {
+                                                          Type = "Google",
+                                                          Header = item.ChildNodes[1].InnerText,
+                                                          Link = item.ChildNodes[2].InnerText
+                                                              .Replace("instagram.com", "")
+                                                              .Replace(" > ", "/")
+                                                              .Replace(" › ", "instagram.com/"),
+                                                          Description = ListOfDesc[counter].InnerText
+                                                      }
+                                                  );
+
+                                              }
+                                              catch (Exception e)
+                                              {
+                                                  continue;
+                                              }
+                                              counter++;
+                                          }
 
 
-                    }
-                    catch (Exception) { }
-                        await page.CloseAsync();
-                    }
-                    
-        
-            });
+                                      }
+                                      googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
+
+                                      //       counter++;
+                                      //     }
+
+
+
+                                      await page.CloseAsync();
+
+                                  }
+                                  catch (Exception e)
+                                  {
+
+                                      //debug here 
+                                  }
+                              }
+                          });
+
 
             /////////////////////////////////////////////////////////////////////////
 
-            
+
 
             List<GenericGoogleResult> InstgramResultsList = new();
 
@@ -1202,10 +1212,13 @@ InstgramResultsList.Add(
                     {
 
                         try
-                        {
+                        {    
+                            await page.SetViewportAsync(
+                         new ViewPortOptions() { IsLandscape = true, IsMobile = false, Width = 1700 }
+                     );
+                         
                             await page.GoToAsync(APIs.GoogleEngine_Endpoint + "search?q=" + query);
-
-                            //       await page.WaitForSelectorAsync("#APjFqb");
+                          //       await page.WaitForSelectorAsync("#APjFqb");
                             //      await page.FocusAsync("#APjFqb");
                             //      await page.Keyboard.TypeAsync(query);
                             //     await page.Keyboard.PressAsync(PuppeteerSharp.Input.Key.Enter);
@@ -1214,7 +1227,7 @@ InstgramResultsList.Add(
                             await page.SetJavaScriptEnabledAsync(true);
                             //         await page.EvaluateExpressionAsync("window.scrollBy(0, 2000)");
 
-
+                          await Task.Delay(3000);
 
                             var content = await page.GetContentAsync();
                             HtmlDocument htmlDocument = new();
@@ -1231,6 +1244,9 @@ InstgramResultsList.Add(
                                 .Where(r => r.ParentNode.ParentNode.Attributes["class"] != null)
                                 .Where(y => y.ParentNode.ParentNode.Attributes["class"].Value == "yuRUbf")
                                 .ToList();
+                            if (filters!=null) {
+                            
+                
                             foreach (var result in filters.ChildNodes)
                             {
                                 try
@@ -1248,7 +1264,11 @@ InstgramResultsList.Add(
                                         googleEngineResult.Filters.Add(result.InnerText, link);
                                     }
                                 }
-                                catch (Exception) { }
+                                catch (Exception) {
+                                    continue;
+                                }
+                            }
+        
                             }
 
                             var ListOfDesc = htmlDocument.DocumentNode.ChildNodes
@@ -1289,23 +1309,35 @@ InstgramResultsList.Add(
                            
 
                             var counter = 0;
-                            foreach (var item in Results)
+                            if (Results != null)
                             {
-                                googleEngineResult.genericGoogleResults.Add(
-                                    new GenericGoogleResult()
+                                foreach (var item in Results)
+                                {
+                                    try
                                     {
-                                        Type = "Google",
-                                        Header = item.ChildNodes[1].InnerText,
-                                        Link = item.ChildNodes[2].InnerText
-                                            .Replace("instagram.com", "")
-                                            .Replace(" > ", "/")
-                                            .Replace(" › ", "instagram.com/"),
-                                        Description = ListOfDesc[counter].InnerText
+                                        googleEngineResult.genericGoogleResults.Add(
+                                            new GenericGoogleResult()
+                                            {
+                                                Type = "Google",
+                                                Header = item.ChildNodes[1].InnerText,
+                                                Link = item.ChildNodes[2].InnerText
+                                                    .Replace("instagram.com", "")
+                                                    .Replace(" > ", "/")
+                                                    .Replace(" › ", "instagram.com/"),
+                                                Description = ListOfDesc[counter].InnerText
+                                            }
+                                        );
+                                      
                                     }
-                                );
-                                counter++;
-                            }
+                                    catch (Exception e)
+                                    {
+                                        continue;
+                                    } 
+                                    counter++;
+                                }
 
+
+                            }
                             googleEngineResult.AboutDiv = "<h3>Welcome</h3>";
 
                             //       counter++;
@@ -1315,14 +1347,17 @@ InstgramResultsList.Add(
                        
                         await page.CloseAsync();
                         
-                       }catch (Exception e) { }
+                       }catch (Exception e) 
+                        {
+                        
+                        //debug here 
+                        }
                     }
                 });
 
                 //////////////////////////////////////////////////////////////////
                 //////////////////////////////////////////////////////////////////////
             
-           
 
             var sr = new SearchResult()
             {
