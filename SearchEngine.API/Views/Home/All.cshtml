@@ -10,109 +10,80 @@
 
 <h1 style="color:azure">All</h1>
 
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+  <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-google-tab" data-bs-toggle="pill" data-bs-target="#pills-google" type="button" role="tab" aria-controls="pills-google" aria-selected="true">Google</button>
+  </li>
+  <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-images-tab" data-bs-toggle="pill" data-bs-target="#pills-images" type="button" role="tab" aria-controls="pills-images" aria-selected="false">Images</button>
+  </li>
+  <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-news-tab" data-bs-toggle="pill" data-bs-target="#pills-news" type="button" role="tab" aria-controls="pills-news" aria-selected="false">News</button>
+  </li>
+	<li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-youtube-tab" data-bs-toggle="pill" data-bs-target="#pills-youtube" type="button" role="tab" aria-controls="pills-youtube" aria-selected="false">Youtube</button>
+	</li>
+	<li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-wikipedia-tab" data-bs-toggle="pill" data-bs-target="#pills-wikipedia" type="button" role="tab" aria-controls="pills-wikipedia" aria-selected="false">Wikipedia</button>
+	</li>
 
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="google-tab" data-bs-toggle="tab" data-bs-target="#google"
-                type="button" role="tab" aria-controls="google" aria-selected="true">
-            Google
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="images-tab" data-bs-toggle="tab" data-bs-target="#images"
-                type="button" role="tab" aria-controls="images" aria-selected="true">
-            Images
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="youtube-tab" data-bs-toggle="tab" data-bs-target="#youtube"
-                type="button" role="tab" aria-controls="youtube" aria-selected="true">
-        Youtube
-    </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="insta-tab" data-bs-toggle="tab" data-bs-target="#insta"
-                type="button" role="tab" aria-controls="insta" aria-selected="true">
-        Instagram
-    </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="twitter-tab" data-bs-toggle="tab" data-bs-target="#twitter"
-                type="button" role="tab" aria-controls="twitter" aria-selected="true">
-            Twitter
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
-                type="button" role="tab" aria-controls="reviews" aria-selected="true">
-            Google Reviews
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="wiki-tab" data-bs-toggle="tab" data-bs-target="#wiki"
-                type="button" role="tab" aria-controls="wiki" aria-selected="true">
-      Wikipedia
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="news-tab" data-bs-toggle="tab" data-bs-target="#news"
-                type="button" role="tab" aria-controls="news" aria-selected="true">
-          News
-        </button>
-    </li>
-  
+	<li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-twitter-tab" data-bs-toggle="pill" data-bs-target="#pills-twitter" type="button" role="tab" aria-controls="pills-twitter" aria-selected="false">Twitter</button>
+	</li>
+	<li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-insta-tab" data-bs-toggle="pill" data-bs-target="#pills-insta" type="button" role="tab" aria-controls="pills-insta" aria-selected="false">Instagram</button>
+	</li>
+	<li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-reviews-tab" data-bs-toggle="pill" data-bs-target="#pills-reviews" type="button" role="tab" aria-controls="pills-reviews" aria-selected="false">Reviews</button>
+	</li>
 </ul>
-<div class="tab-content" id="myTabContent">
+<div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-google" role="tabpanel" aria-labelledby="pills-google-tab">
 
-    <div class="tab-pane fade show active" id="google" role="tabpanel" aria-labelledby="google-tab">
         @await Html.PartialAsync("_google",Model.Where(y=>y.SourceID==(int)SearchResultType.Google_Engine).First())
-
-    </div>
-
-    <div class="tab-pane fade" id="images" role="tabpanel" aria-labelledby="images-tab">
+  </div>
+    <div class="tab-pane fade" id="pills-images" role="tabpanel" aria-labelledby="pills-images-tab">
 
         @await Html.PartialAsync("_Images",Model.Where(y=>y.SourceID==(int)SearchResultType.Images).First())
+    </div>
+    <div class="tab-pane fade" id="pills-news" role="tabpanel" aria-labelledby="pills-news-tab">
+        @await Html.PartialAsync("_news",(List<NewsModel>)Model.Where(y=>y.SourceID==(int)SearchResultType.Google_News).First().Result)
+
 
     </div>
-    <div class="tab-pane fade" id="youtube" role="tabpanel" aria-labelledby="youtube-tab">
+    <div class="tab-pane fade" id="pills-youtube" role="tabpanel" aria-labelledby="pills-youtube-tab">
         @await Html.PartialAsync("_youtube",(List<YoutubeResultModel>)Model.Where(y=>y.SourceID==(int)SearchResultType.Youtube).First().Result)
 
 
     </div>
-    <div class="tab-pane fade" id="insta" role="tabpanel" aria-labelledby="insta-tab">
-
-        @await Html.PartialAsync("_instagram",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Instagram).First().Result)
-
-
-    </div>
-    <div class="tab-pane fade" id="twitter" role="tabpanel" aria-labelledby="twitter-tab">
-        @await Html.PartialAsync("_twitter",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Twitter).First().Result)
-
-
-
-    </div>
-    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
-
-
-  
-    @await Html.PartialAsync("_reviews",(List<GoogleReviewResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Google_Reviews).First().Result)
-    </div>
-
-
-
-    
-    <div class="tab-pane fade" id="wiki" role="tabpanel" aria-labelledby="wiki-tab">
-
+    <div class="tab-pane fade" id="pills-wikipedia" role="tabpanel" aria-labelledby="pills-wikipedia-tab">
         @await Html.PartialAsync("_wikipedia",(List<WikipediaResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Wikipedia).First().Result)
 
 
 
     </div>
+    <div class="tab-pane fade" id="pills-twitter" role="tabpanel" aria-labelledby="pills-twitter-tab">
 
-    <div class="tab-pane fade" id="news" role="tabpanel" aria-labelledby="news-tab">
-       @await Html.PartialAsync("_news",(List<NewsModel>)Model.Where(y=>y.SourceID==(int)SearchResultType.Google_News).First().Result)
+             @await Html.PartialAsync("_twitter",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Twitter).First().Result)
+
     </div>
+          <div class="tab-pane fade" id="pills-insta" role="tabpanel" aria-labelledby="pills-insta-tab">
 
+        @await Html.PartialAsync("_instagram",(List<GenericGoogleResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Instagram).First().Result)
+
+          </div>
+    <div class="tab-pane fade" id="pills-reviews" role="tabpanel" aria-labelledby="pills-reviews-tab">
+
+        @await Html.PartialAsync("_reviews",(List<GoogleReviewResult>)Model.Where(y=>y.SourceID==(int)SearchResultType.Google_Reviews).First().Result)
+
+
+    </div>
 </div>
+
+
+
+
+
+
 
 
