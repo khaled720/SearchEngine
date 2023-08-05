@@ -19,9 +19,11 @@
 
         public static string  GoogleEngine_Endpoint { get; } = "https://www.google.com/";
 
-        public static string  GoogleTranslate_Endpoint { get; } = " https://translate.google.com";
+        public static string  GoogleTranslate_Endpoint { get; } = "https://translate.google.com";
 
-       
+
+        public static string BingEngine_Endpoint { get; } = "https://bing.com/";
+
 
 
     }
